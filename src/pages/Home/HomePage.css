@@ -1,0 +1,65 @@
+/* HomePage.css */
+.fixed-header {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  .homepage-content {
+    padding: 150px;
+    text-align: center;
+    background-color: #dbe0e7;
+    height: fit-content;
+    border: 2px solid #ccc; /* Add a border around the content */
+    margin-top: 64px; /* Adjust the margin-top to account for the fixed header height */
+  }
+  
+  .intro-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  
+  .intro-text {
+    flex: 1;
+    max-width: 600px;
+    margin-right: 20px;
+    text-align: left;
+  }
+  
+  .intro-text h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+  }
+  
+  .intro-text p {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+  }
+  
+  .intro-images {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    max-width: 600px;
+    position: relative;
+  }
+  
+  .intro-images .main-image {
+    max-width: 100%;
+    border-radius: 10px;
+  }
+  
+  .intro-images .sub-image {
+    width: 250px;
+    height: 200px; /* Fixed the height value */
+    border-radius: 10px;
+    position: absolute;
+    top: 220px;
+    left: -50px;
+    border: 5px solid white;
+  }
+  

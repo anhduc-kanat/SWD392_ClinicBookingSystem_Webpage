@@ -1,0 +1,50 @@
+/* components/Introducing.css */
+.introducing-section {
+    margin-top: 7rem;
+    text-align: center;
+  }
+  
+  .introducing-section h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 2rem;
+  }
+  
+  .reviews {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Align items vertically in the center */
+    margin-top: 2rem;
+  }
+  
+  .review {
+    margin: 0 2rem;
+    text-align: center; /* Center text inside each review */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center items horizontally */
+  }
+  
+  .review img {
+    width: auto; /* Maintain aspect ratio */
+    height: 50px; /* Ensure images are the same height */
+  }
+  
+  
+  .review p {
+    margin-top: 1rem;
+    font-size: 1rem;
+    color: #555;
+    text-align: center;
+  }
+  .stars {
+    display: flex;
+    justify-content: center;
+    margin: 0.5rem 0; /* Margin between stars and text */
+  }
+  
+  .star-icon {
+    color: #fadb14; /* Gold color for stars */
+    margin: 0 0.1rem; /* Small margin between stars */
+  }

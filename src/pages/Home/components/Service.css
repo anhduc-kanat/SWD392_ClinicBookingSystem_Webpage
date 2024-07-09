@@ -1,0 +1,47 @@
+.service-card {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border-radius: 10px;
+  background: #f9f9f9;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  margin-bottom: 2rem;
+}
+
+.service-content {
+  display: flex;
+  align-items: center;
+}
+
+.service-images {
+  position: relative;
+  margin-right: 20px;
+}
+
+.main-image {
+  width: 250px;
+  height: auto;
+  border-radius: 10px;
+}
+
+.sub-image {
+  position: absolute;
+  bottom: -10px;
+  right: -10px;
+  width: 100px;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.service-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.service-button {
+  background-color: #f0f5ff;
+  color: #1890ff;
+  border: none;
+  margin-bottom: 10px;
+}

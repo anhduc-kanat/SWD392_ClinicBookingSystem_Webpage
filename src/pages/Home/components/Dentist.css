@@ -1,0 +1,39 @@
+.dentist-container {
+    display: flex;
+    align-items: center;
+    margin: 2rem 0;
+    margin-bottom: 2rem;
+  }
+  
+  .dentist-image {
+    border-radius: 8px;
+    width: 50%;
+    margin-right: 2rem;
+  }
+  
+  .dentist-info {
+    max-width: 600px;
+  }
+  
+  .dentist-title {
+    background-color: #e0f7fa;
+    color: #00796b;
+    padding: 0.5rem 1rem;
+    border-radius: 16px;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+  
+  .dentist-info h2 {
+    margin-top: 10px;
+    color: #333;
+    margin-bottom: 10px;
+    font-size:40px ;
+  }
+  
+  .dentist-info p {
+    color: #666;
+    line-height: 1.6;
+    font-size:20px ;
+  }
+  
