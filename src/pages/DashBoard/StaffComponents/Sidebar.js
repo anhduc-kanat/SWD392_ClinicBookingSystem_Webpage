@@ -40,6 +40,11 @@ const Sidebar = () => {
               </NavLink>
             </li>
             <li>
+              <NavLink to="/staff/re-check" className={selectedKey === '/staff/re-check' ? 'active-link' : ''}>
+                Re-Check
+              </NavLink>
+            </li>
+            <li>
               <NavLink to="/staff/check-in" className={selectedKey === '/staff/check-in' ? 'active-link' : ''}>
                 Check-in
               </NavLink>

@@ -7,7 +7,7 @@ import moment from 'moment';
 
 const { Option } = Select;
 
-const CheckIn = () => {
+const ReCheck = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
@@ -48,13 +48,7 @@ const CheckIn = () => {
       );
 
       const { data } = response.data;
-      // Modify data to get status from meetings
-      const modifiedData = data.map(appointment => ({
-        ...appointment,
-        status: appointment.appointmentServices.length > 0 ? appointment.appointmentServices[0].meetings[0].status : appointment.status,
-      }));
-
-      setData(modifiedData);
+      setData(data);
       setPagination({
         current: response.data.pageNumber,
         pageSize: response.data.pageSize,
@@ -121,6 +115,41 @@ const CheckIn = () => {
 
   const columns = [
     {
+      title: 'ID',
+      dataIndex: 'id',
+      key: 'id',
+    },
+    {
+      title: 'Booking Date',
+      dataIndex: 'date',
+      key: 'date',
+    },
+    {
+      title: 'User Account Name',
+      dataIndex: 'userAccountName',
+      key: 'userAccountName',
+    },
+    {
+      title: 'Patient Name',
+      dataIndex: 'patientName',
+      key: 'patientName',
+    },
+    {
+      title: 'Slot Name',
+      dataIndex: 'slotName',
+      key: 'slotName',
+    },
+    {
+      title: 'Start Time',
+      dataIndex: 'startAt',
+      key: 'startAt',
+    },
+    {
+      title: 'End Time',
+      dataIndex: 'endAt',
+      key: 'endAt',
+    },
+    {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
@@ -137,24 +166,6 @@ const CheckIn = () => {
       key: 'actions',
       render: (text, record) => (
         <Button onClick={() => handleViewDetail(record)}>View Detail</Button>
-      ),
-    },
-    {
-      title: 'Meetings',
-      dataIndex: 'appointmentServices',
-      key: 'meetings',
-      render: (appointmentServices) => (
-        <>
-          {appointmentServices.map(service => (
-            <div key={service.id}>
-              {service.meetings.map(meeting => (
-                <div key={meeting.id}>
-                  Date: {meeting.date} - Status: {meeting.status}
-                </div>
-              ))}
-            </div>
-          ))}
-        </>
       ),
     },
   ];
@@ -226,46 +237,51 @@ const CheckIn = () => {
         rowKey="id"
         style={{ marginTop: '20px' }}
       />
-      <Modal
-        title="Appointment Details"
-        visible={isModalVisible}
-        onCancel={handleModalClose}
-        footer={null}
-        style={{ minWidth: '600px' }}
-      >
-        {selectedAppointment && (
-          <div>
-            <div style={{ marginBottom: '20px' }}>
-              <div><strong>ID:</strong> {selectedAppointment.id}</div>
-              <div><strong>Booking Date:</strong> {selectedAppointment.date}</div>
-              <div><strong>User Account Name:</strong> {selectedAppointment.userAccountName}</div>
-              <div><strong>Patient Name:</strong> {selectedAppointment.patientName}</div>
-              <div><strong>Slot Name:</strong> {selectedAppointment.slotName}</div>
-              <div><strong>Start Time:</strong> {selectedAppointment.startAt}</div>
-              <div><strong>End Time:</strong> {selectedAppointment.endAt}</div>
-              <div><strong>Status:</strong> {statusText[selectedAppointment.status]}</div>
+<Modal
+  title="Appointment Details"
+  visible={isModalVisible}
+  onCancel={handleModalClose}
+  footer={null}
+  style={{ minWidth: '600px' }}
+>
+  {selectedAppointment && (
+    <div>
+        <div style={{ display: 'grid', gridTemplateColumns: '4fr 3fr', gap: '120px', marginBottom:'20px' }}>
+      <div>
+        <div><strong>ID:</strong> {selectedAppointment.id}</div>
+        <div><strong>Booking Date:</strong> {selectedAppointment.date}</div>
+        <div><strong>User Account Name:</strong> {selectedAppointment.userAccountName}</div>
+        <div><strong>Patient Name:</strong> {selectedAppointment.patientName}</div>
+      </div>
+      <div>
+        <div><strong>Slot Name:</strong> {selectedAppointment.slotName}</div>
+        <div><strong>Start Time:</strong> {selectedAppointment.startAt}</div>
+        <div><strong>End Time:</strong> {selectedAppointment.endAt}</div>
+        <div><strong>Status:</strong> {statusText[selectedAppointment.status]}</div>
+      </div>
+    </div>
+      {/* <div><strong>Additional Information:</strong> </div> */}
+      <div><strong>Appointment Services:</strong></div>
+      {selectedAppointment.appointmentServices.map(service => (
+        <div key={service.id} style={{ marginBottom: '10px', paddingLeft: '10px', borderLeft: '2px solid #1890ff' }}>
+          <p>
+            <strong>{service.serviceName}</strong> - {service.servicePrice}
+          </p>
+          <p style={{ marginBottom: '5px' }}><strong>Meetings:</strong></p>
+          {service.meetings.map(meeting => (
+            <div key={meeting.id} style={{ marginBottom: '5px', paddingLeft: '10px', borderLeft: '2px solid #fadb14' }}>
+              Date: {meeting.date}
             </div>
-            <div><strong>Appointment Services:</strong></div>
-            {selectedAppointment.appointmentServices.map(service => (
-              <div key={service.id} style={{ marginBottom: '10px', paddingLeft: '10px', borderLeft: '2px solid #1890ff' }}>
-                <p>
-                  <strong>{service.serviceName}</strong> - {service.servicePrice}
-                </p>
-                <p style={{ marginLeft: '20px' }}>
-                  <strong>Meetings:</strong>
-                  {service.meetings.map(meeting => (
-                    <span key={meeting.id} style={{ marginLeft: '10px' }}>
-                      Date: {meeting.date} - Status: {meeting.status}
-                    </span>
-                  ))}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </Modal>
+          ))}
+        </div>
+      ))}
+    </div>
+  )}
+</Modal>
+
+
     </div>
   );
 };
 
-export default CheckIn;
+export default ReCheck;
