@@ -8,6 +8,8 @@ import StaffDashboard from './pages/DashBoard/StaffDashboard';
 import CustomerDashboard from './pages/DashBoard/CustomerDashboard';
 import DentistDashboard from './pages/DashBoard/DentistDashboard';
 import ProtectedRoute from './ProtectedRoute';
+import AdminDashboard from './pages/DashBoard/AdminDashboard';
+
 
 const App = () => {
   return (
@@ -27,6 +29,10 @@ const App = () => {
         <Route
           path="/dentist/*"
           element={<ProtectedRoute element={<DentistDashboard />} allowedRoles={['DENTIST']} />}
+        />
+        <Route
+          path="/clinicowner/*"
+          element={<ProtectedRoute element={<AdminDashboard />} allowedRoles={['ADMIN']} />}
         />
       </Routes>
     </Router>

@@ -36,6 +36,9 @@ const LoginPage = () => {
         case 'DENTIST':
           navigate('/dentist/user-info');
           break;
+        case 'ADMIN':
+          navigate('/clinicowner/dentist');
+          break;
         default:
           navigate('/');
           break;
