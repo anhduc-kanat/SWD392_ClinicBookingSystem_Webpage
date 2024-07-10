@@ -5,6 +5,7 @@ import Header from './DentistComponents/Header';
 import Sidebar from './DentistComponents/Sidebar';
 import Appointment from './DentistPage/Appointment';
 import UserInfo from './DentistPage/UserInfo';
+import Result from './DentistPage/Result';
 import './CustomerDashboard.css';
 
 const DentistDashboard = () => {
@@ -15,6 +16,7 @@ const DentistDashboard = () => {
         <Sidebar />
         <div className="main-content">
           <Routes>
+          <Route path="result" element={<Result />} />
             <Route path="appointment" element={<Appointment />} />
             <Route path="user-info" element={<UserInfo />} />
           </Routes>

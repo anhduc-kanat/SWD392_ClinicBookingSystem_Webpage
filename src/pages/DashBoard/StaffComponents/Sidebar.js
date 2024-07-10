@@ -16,10 +16,10 @@ const Sidebar = () => {
     const path = location.pathname;
     setSelectedKey(path);
 
-    if (path.includes('/staff/booking') || path.includes('/staff/user-info')|| path.includes('/staff/payment')) {
+    if (path.includes('/staff/booking') || path.includes('/staff/user-info') || path.includes('/staff/payment')) {
       setActivePanel('1');
-    // } else if (path.includes('/staff/user-profile') ) {
-    //   setActivePanel('2');
+      // } else if (path.includes('/staff/user-profile') ) {
+      //   setActivePanel('2');
     }
   }, [location]);
 
@@ -40,15 +40,16 @@ const Sidebar = () => {
               </NavLink>
             </li>
             <li>
-              <NavLink to="/staff/user-info" className={selectedKey === '/staff/user-info' ? 'active-link' : ''}>
-                Thông tin người dùng
-              </NavLink>
-            </li>
-            <li>
               <NavLink to="/staff/check-in" className={selectedKey === '/staff/check-in' ? 'active-link' : ''}>
                 Check-in
               </NavLink>
             </li>
+            <li>
+              <NavLink to="/staff/user-info" className={selectedKey === '/staff/user-info' ? 'active-link' : ''}>
+                Thông tin người dùng
+              </NavLink>
+            </li>
+
             <li>
               <NavLink to="/staff/payment" className={selectedKey === '/staff/payment' ? 'active-link' : ''}>
                 Thanh toán

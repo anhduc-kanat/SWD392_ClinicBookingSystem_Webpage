@@ -85,7 +85,7 @@ const Booking = () => {
         });
         const patients = response.data.data;
         const options = patients.map(patient => ({
-          label: `${patient.firstName} ${patient.lastName}`,
+          label: `${patient.firstName} ${patient.lastName} -Sinh ngày: ${patient.dateOfBirth}`,
           value: patient.id
         }));
         setPatientOptions(options);

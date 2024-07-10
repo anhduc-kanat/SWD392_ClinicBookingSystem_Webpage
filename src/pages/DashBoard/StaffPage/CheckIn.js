@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Form, Select, message, Button } from 'antd';
+import { Table, Form, Select, message, Button, Modal } from 'antd';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
@@ -15,13 +15,15 @@ const CheckIn = () => {
     pageSize: 10,
     total: 0,
   });
-  const [selectedDate, setSelectedDate] = useState(new Date()); // State to hold selected date, initialized with current date
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   useEffect(() => {
     if (selectedDate) {
       fetchData(pagination.current, pagination.pageSize, moment(selectedDate).format('YYYY-MM-DD'));
     }
-  }, [selectedDate]); // Fetch data whenever selectedDate changes
+  }, [selectedDate]);
 
   const fetchData = async (pageNumber, pageSize, date) => {
     setLoading(true);
@@ -83,7 +85,7 @@ const CheckIn = () => {
 
       message.success('Status updated successfully');
       if (selectedDate) {
-        fetchData(pagination.current, pagination.pageSize, moment(selectedDate).format('YYYY-MM-DD')); // Refresh data after update
+        fetchData(pagination.current, pagination.pageSize, moment(selectedDate).format('YYYY-MM-DD'));
       }
     } catch (error) {
       message.error('Failed to update status');
@@ -98,7 +100,17 @@ const CheckIn = () => {
   };
 
   const handleDateChange = (date) => {
-    setSelectedDate(date); // Update selected date
+    setSelectedDate(date);
+  };
+
+  const handleViewDetail = (record) => {
+    setSelectedAppointment(record);
+    setIsModalVisible(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+    setSelectedAppointment(null);
   };
 
   const columns = [
@@ -108,7 +120,7 @@ const CheckIn = () => {
       key: 'id',
     },
     {
-      title: 'Date',
+      title: 'Booking Date',
       dataIndex: 'date',
       key: 'date',
     },
@@ -149,6 +161,13 @@ const CheckIn = () => {
         />
       ),
     },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (text, record) => (
+        <Button onClick={() => handleViewDetail(record)}>View Detail</Button>
+      ),
+    },
   ];
 
   const EditableCell = ({ record, value, save }) => {
@@ -159,7 +178,7 @@ const CheckIn = () => {
     };
 
     const handleSelectChange = (value) => {
-      save(record.id, value); // Save function called with record ID and selected value
+      save(record.id, value);
       toggleEdit();
     };
 
@@ -209,9 +228,6 @@ const CheckIn = () => {
           customInput={<input style={{ border: '1px solid #d9d9d9', borderRadius: '4px', padding: '5px 10px', width: '100%' }} />}
         />
       </div>
-      {/* <Button type="primary" onClick={() => fetchData(pagination.current, pagination.pageSize, selectedDate ? moment(selectedDate).format('YYYY-MM-DD') : '')}>
-        Tìm kiếm
-      </Button> */}
       <Table
         columns={columns}
         dataSource={data}
@@ -221,6 +237,49 @@ const CheckIn = () => {
         rowKey="id"
         style={{ marginTop: '20px' }}
       />
+<Modal
+  title="Appointment Details"
+  visible={isModalVisible}
+  onCancel={handleModalClose}
+  footer={null}
+  style={{ minWidth: '600px' }}
+>
+  {selectedAppointment && (
+    <div>
+        <div style={{ display: 'grid', gridTemplateColumns: '4fr 3fr', gap: '120px', marginBottom:'20px' }}>
+      <div>
+        <div><strong>ID:</strong> {selectedAppointment.id}</div>
+        <div><strong>Booking Date:</strong> {selectedAppointment.date}</div>
+        <div><strong>User Account Name:</strong> {selectedAppointment.userAccountName}</div>
+        <div><strong>Patient Name:</strong> {selectedAppointment.patientName}</div>
+      </div>
+      <div>
+        <div><strong>Slot Name:</strong> {selectedAppointment.slotName}</div>
+        <div><strong>Start Time:</strong> {selectedAppointment.startAt}</div>
+        <div><strong>End Time:</strong> {selectedAppointment.endAt}</div>
+        <div><strong>Status:</strong> {statusText[selectedAppointment.status]}</div>
+      </div>
+    </div>
+      {/* <div><strong>Additional Information:</strong> </div> */}
+      <div><strong>Appointment Services:</strong></div>
+      {selectedAppointment.appointmentServices.map(service => (
+        <div key={service.id} style={{ marginBottom: '10px', paddingLeft: '10px', borderLeft: '2px solid #1890ff' }}>
+          <p>
+            <strong>{service.serviceName}</strong> - {service.servicePrice}
+          </p>
+          <p style={{ marginBottom: '5px' }}><strong>Meetings:</strong></p>
+          {service.meetings.map(meeting => (
+            <div key={meeting.id} style={{ marginBottom: '5px', paddingLeft: '10px', borderLeft: '2px solid #fadb14' }}>
+              Date: {meeting.date}
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  )}
+</Modal>
+
+
     </div>
   );
 };

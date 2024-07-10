@@ -39,11 +39,17 @@ const Sidebar = () => {
                 Appointment
               </NavLink>
             </li>
+             {/* <li>
+              <NavLink to="/dentist/result" className={selectedKey === '/dentist/result' ? 'active-link' : ''}>
+                Trả kết quả
+              </NavLink>
+            </li> */}
             <li>
               <NavLink to="/dentist/user-info" className={selectedKey === '/dentist/user-info' ? 'active-link' : ''}>
                 Thông tin người dùng
               </NavLink>
             </li>
+           
           </ul>
         </Panel>
         {/* <Panel header="HỒ SƠ KHÁM BỆNH" style={{ fontSize: '15px', fontWeight: 'bold', fontFamily: 'sans-serif' }} key="2">

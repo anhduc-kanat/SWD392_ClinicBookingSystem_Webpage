@@ -1,231 +1,436 @@
-import React, { useState, useEffect } from 'react';
-import { Switch } from '@material-ui/core';
-import { fetchUserProfile, updateUserProfile } from '../../../redux/UserProfileSlice'; // Import API functions
+import React, { useEffect, useState } from 'react';
+import { Collapse, Modal, Form, Input, Select, Button, Row, Col, message, DatePicker } from 'antd';
+import dayjs from 'dayjs'; // Import dayjs for date formatting
+import { fetchUserProfile } from '../../../redux/UserProfileSlice'; // Adjust the path to your slice file
+import './UserProfile.css'; // Import the CSS file
+
+const { Option } = Select;
+const { Panel } = Collapse;
+const { confirm } = Modal;
+
+// Use environment variable for API base URL
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const UserProfile = () => {
-  const initialUserData = {
-    id: 0,
-    firstName: "",
-    lastName: "",
-    gender: 0,
-    address: "",
-    dateOfBirth: "",
-    phoneNumber: "",
-    cccd: "",
-    email: "",
-    groupId: "",
-    type: ""
-  };
-
-  const [userData, setUserData] = useState(initialUserData);
-  const [loading, setLoading] = useState(true);
+  const [userProfiles, setUserProfiles] = useState([]);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [addModalVisible, setAddModalVisible] = useState(false);
 
   useEffect(() => {
-    const loadUserProfile = async () => {
+    const fetchUserProfileData = async () => {
       try {
         const data = await fetchUserProfile();
-        setUserData(data);
+        setUserProfiles(data);
       } catch (error) {
-        console.error('Error loading user profile:', error.message);
-      } finally {
-        setLoading(false);
+        console.error('Error fetching user profiles:', error.message);
       }
     };
 
-    loadUserProfile();
+    fetchUserProfileData();
   }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUserData({
-      ...userData,
-      [name]: value
-    });
+  const handleEdit = (user) => {
+    setSelectedUser(user);
+    setEditModalVisible(true);
   };
 
-  const handleSwitchChange = (e) => {
-    const { name, checked } = e.target;
-    setUserData({
-      ...userData,
-      [name]: checked
-    });
+  const handleCancelEdit = () => {
+    setEditModalVisible(false);
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSave = async () => {
     try {
-      await updateUserProfile(userData);
-      console.log('User profile updated successfully');
+      const response = await fetch(`${API_BASE_URL}/user-profile/update?id=${selectedUser.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(selectedUser),
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      message.success('User updated successfully');
+      setEditModalVisible(false);
+      window.location.reload(); // Reload the page upon successful update
     } catch (error) {
-      console.error('Error updating user profile:', error.message);
+      console.error('Error updating user:', error.message);
+      message.error('Error updating user');
     }
   };
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
+  const handleAddNew = () => {
+    setSelectedUser(null); // Clear selected user when adding new
+    setAddModalVisible(true);
+  };
+
+  const handleCancelAdd = () => {
+    setAddModalVisible(false);
+  };
+
+  const handleSaveNew = async () => {
+    try {
+      // Get access token from local storage
+      const accessToken = localStorage.getItem('accessToken');
+  
+      const response = await fetch(`${API_BASE_URL}/user-profile/new`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(selectedUser),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      message.success('New user profile added successfully');
+      setAddModalVisible(false);
+      window.location.reload(); // Reload the page upon successful update
+    } catch (error) {
+      console.error('Error adding new user profile:', error.message);
+      message.error('Error adding new user profile');
+    }
+  };
+
+  const showDeleteConfirm = (userId) => {
+    confirm({
+      title: 'Are you sure you want to delete this user?',
+      content: 'This action cannot be undone.',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        handleDelete(userId);
+      },
+    });
+  };
+
+  const handleDelete = async (userId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user-profile/delete/${userId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      message.success('User deleted successfully');
+      setUserProfiles(userProfiles.filter(user => user.id !== userId));
+    } catch (error) {
+      console.error('Error deleting user:', error.message);
+      message.error('Error deleting user');
+    }
+  };
 
   return (
-    <div className="bg-gray-100 border border-4 rounded-lg shadow relative mt-10 max-w-screen-xl mx-auto">
-      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6 p-6">
-        <div>
-          <div className="mb-4">
-            <label htmlFor="firstName" className="text-sm font-semibold text-gray-900 block mb-2">
-              First Name
-            </label>
-            <input
-              type="text"
-              name="firstName"
-              id="firstName"
-              className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
-              value={userData.firstName}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="lastName" className="text-sm font-semibold text-gray-900 block mb-2">
-              Last Name
-            </label>
-            <input
-              type="text"
-              name="lastName"
-              id="lastName"
-              className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
-              value={userData.lastName}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="gender" className="text-sm font-semibold text-gray-900 block mb-2">
-              Gender
-            </label>
-            <select
-              name="gender"
-              id="gender"
-              className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
-              value={userData.gender}
-              onChange={handleChange}
-            >
-              <option value={0}>Male</option>
-              <option value={1}>Female</option>
-            </select>
-          </div>
-          <div className="mb-4">
-            <label htmlFor="dateOfBirth" className="text-sm font-semibold text-gray-900 block mb-2">
-              Date of Birth
-            </label>
-            <input
-              type="text"
-              name="dateOfBirth"
-              id="dateOfBirth"
-              className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
-              value={formatDate(userData.dateOfBirth)}
-              readOnly
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="phoneNumber" className="text-sm font-semibold text-gray-900 block mb-2">
-              Phone Number
-            </label>
-            <input
-              type="text"
-              name="phoneNumber"
-              id="phoneNumber"
-              className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
-              value={userData.phoneNumber}
-              onChange={handleChange}
-            />
-          </div>
-        </div>
-        <div>
-          <div className="mb-4">
-            <label htmlFor="address" className="text-sm font-semibold text-gray-900 block mb-2">
-              Address
-            </label>
-            <input
-              type="text"
-              name="address"
-              id="address"
-              className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
-              value={userData.address}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="cccd" className="text-sm font-semibold text-gray-900 block mb-2">
-              CCCD (ID Card)
-            </label>
-            <input
-              type="text"
-              name="cccd"
-              id="cccd"
-              className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
-              value={userData.cccd}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="groupId" className="text-sm font-semibold text-gray-900 block mb-2">
-              Group ID
-            </label>
-            <input
-              type="text"
-              name="groupId"
-              id="groupId"
-              className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
-              value={userData.groupId}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="type" className="text-sm font-semibold text-gray-900 block mb-2">
-              Type
-            </label>
-            <input
-              type="text"
-              name="type"
-              id="type"
-              className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
-              value={userData.type}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex justify-between mb-4">
-            <div>
-              <label htmlFor="emailConfirmed" className="font-semibold mr-2">
-                Email Confirmed:
-              </label>
-              <Switch
-                name="emailConfirmed"
-                checked={userData.emailConfirmed}
-                onChange={handleSwitchChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="phoneConfirmed" className="font-semibold mr-2">
-                Phone Confirmed:
-              </label>
-              <Switch
-                name="phoneConfirmed"
-                checked={userData.phoneConfirmed}
-                onChange={handleSwitchChange}
-              />
-            </div>
-          </div>
-        </div>
-        <button
-          type="submit"
-          className="col-span-2 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
-        >
-          Save Changes
-        </button>
-      </form>
-    </div>
+    <>
+      <Button type="primary" style={{ marginBottom: '20px' }} onClick={handleAddNew}>
+        Thêm hồ sơ
+      </Button>
+
+      <Collapse style={{ marginBottom: '20px' }}>
+        {userProfiles.map(user => (
+          <Panel
+            header={`${user.id} - ${user.firstName} ${user.lastName}`}
+            key={user.id}
+            className="user-panel"
+          >
+            <Form layout="vertical">
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item label="First Name">
+                    <Input value={user.firstName} readOnly />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label="Last Name">
+                    <Input value={user.lastName} readOnly />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item label="Gender">
+                    <Select value={user.gender} disabled>
+                      <Option value={0}>Male</Option>
+                      <Option value={1}>Female</Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label="Address">
+                    <Input value={user.address} readOnly />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item label="Date of Birth">
+                    <Input value={user.dateOfBirth} readOnly />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label="Phone Number">
+                    <Input value={user.phoneNumber} readOnly />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item label="Email">
+                    <Input value={user.email} readOnly />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label="Type">
+                    <Input value={user.type} readOnly />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item label="CCCD">
+                    <Input value={user.cccd} readOnly />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label="Group ID">
+                    <Input value={user.groupId} readOnly />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Button type="link" onClick={() => handleEdit(user)}>Edit</Button>
+              <Button type="link" danger onClick={() => showDeleteConfirm(user.id)}>Delete</Button>
+            </Form>
+          </Panel>
+        ))}
+      </Collapse>
+
+      <Modal
+        title="Edit User"
+        visible={editModalVisible}
+        onCancel={handleCancelEdit}
+        footer={[
+          <Button key="cancel" onClick={handleCancelEdit}>
+            Cancel
+          </Button>,
+          <Button key="save" type="primary" onClick={handleSave}>
+            Save
+          </Button>,
+        ]}
+      >
+        <Form layout="vertical">
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="First Name">
+                <Input
+                  value={selectedUser?.firstName}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, firstName: e.target.value })}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Last Name">
+                <Input
+                  value={selectedUser?.lastName}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, lastName: e.target.value })}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Gender">
+                <Select
+                  value={selectedUser?.gender}
+                  onChange={(value) => setSelectedUser({ ...selectedUser, gender: value })}
+                >
+                  <Option value={0}>Male</Option>
+                  <Option value={1}>Female</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Address">
+                <Input
+                  value={selectedUser?.address}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, address: e.target.value })}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Date of Birth">
+                <DatePicker
+                  value={selectedUser?.dateOfBirth ? dayjs(selectedUser.dateOfBirth) : null}
+                  onChange={(date, dateString) => setSelectedUser({ ...selectedUser, dateOfBirth: dateString })}
+                  format="YYYY-MM-DD"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Phone Number">
+                <Input
+                  value={selectedUser?.phoneNumber}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, phoneNumber: e.target.value })}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Email">
+                <Input
+                  value={selectedUser?.email}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, email: e.target.value })}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Type">
+                <Input
+                  value={selectedUser?.type}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, type: e.target.value })}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="CCCD">
+                <Input
+                  value={selectedUser?.cccd}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, cccd: e.target.value })}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Group ID">
+                <Input
+                  value={selectedUser?.groupId}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, groupId: e.target.value })}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="Add New User"
+        visible={addModalVisible}
+        onCancel={handleCancelAdd}
+        footer={[
+          <Button key="cancel" onClick={handleCancelAdd}>
+            Cancel
+          </Button>,
+          <Button key="save" type="primary" onClick={handleSaveNew}>
+            Save
+          </Button>,
+        ]}
+      >
+        <Form layout="vertical">
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="First Name">
+                <Input
+                  value={selectedUser?.firstName || ''}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, firstName: e.target.value })}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Last Name">
+                <Input
+                  value={selectedUser?.lastName || ''}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, lastName: e.target.value })}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Gender">
+                <Select
+                  value={selectedUser?.gender || 0}
+                  onChange={(value) => setSelectedUser({ ...selectedUser, gender: value })}
+                >
+                  <Option value={0}>Male</Option>
+                  <Option value={1}>Female</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Address">
+                <Input
+                  value={selectedUser?.address || ''}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, address: e.target.value })}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Date of Birth">
+                <DatePicker
+                  value={selectedUser?.dateOfBirth ? dayjs(selectedUser.dateOfBirth) : null}
+                  onChange={(date, dateString) => setSelectedUser({ ...selectedUser, dateOfBirth: dateString })}
+                  format="YYYY-MM-DD"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Phone Number">
+                <Input
+                  value={selectedUser?.phoneNumber || ''}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, phoneNumber: e.target.value })}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Email">
+                <Input
+                  value={selectedUser?.email || ''}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, email: e.target.value })}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Type">
+                <Input
+                  value={selectedUser?.type || ''}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, type: e.target.value })}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="CCCD">
+                <Input
+                  value={selectedUser?.cccd || ''}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, cccd: e.target.value })}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Group ID">
+                <Input
+                  value={selectedUser?.groupId || ''}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, groupId: e.target.value })}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Modal>
+    </>
   );
 };
 

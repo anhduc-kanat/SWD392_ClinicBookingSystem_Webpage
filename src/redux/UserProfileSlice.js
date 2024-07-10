@@ -18,21 +18,12 @@ api.interceptors.request.use((config) => {
 export const fetchUserProfile = async () => {
   try {
     const response = await api.get('/user-profile/get-profile-by-customer');
-    return response.data.data[0];
+    return response.data.data; // Trả về toàn bộ mảng dữ liệu người dùng
   } catch (error) {
-    console.error('Error fetching user profile:', error.message);
+    console.error('Error fetching user profiles:', error.message);
     throw error;
   }
 };
 
-export const updateUserProfile = async (userData) => {
-  try {
-    const response = await api.put('/user-profile/update-profile', userData);
-    return response.data;
-  } catch (error) {
-    console.error('Error updating user profile:', error.message);
-    throw error;
-  }
-};
 
 export default api;
