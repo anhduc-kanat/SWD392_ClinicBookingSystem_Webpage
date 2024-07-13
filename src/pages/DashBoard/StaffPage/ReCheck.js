@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Form, Select, message, Button, Modal } from 'antd';
+import { Table, message, Button, DatePicker } from 'antd';
 import axios from 'axios';
-import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css";
-import moment from 'moment';
-
-const { Option } = Select;
+import dayjs from 'dayjs';
+import AppointmentDetailModal from '../StaffComponents/AppointmentDetailModal'; // Adjust the path based on your file structure
 
 const ReCheck = () => {
   const [data, setData] = useState([]);
@@ -15,13 +12,31 @@ const ReCheck = () => {
     pageSize: 10,
     total: 0,
   });
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(dayjs());
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
 
+  const meetingStatusText = {
+    0: 'N/A',
+    1: 'Done',
+    2: 'CheckIn',
+    3: 'Waiting',
+    4: 'Future',
+    5: 'InQueue'
+  };
+  const statusText = {
+    2: 'OnGoing',
+    3: 'Scheduled',
+    4: 'Rejected',
+    5: 'Pending',
+    6: 'OnTreatment',
+    7: 'Queued',
+    8: 'Waiting',
+  };
+
   useEffect(() => {
     if (selectedDate) {
-      fetchData(pagination.current, pagination.pageSize, moment(selectedDate).format('YYYY-MM-DD'));
+      fetchData(pagination.current, pagination.pageSize, selectedDate.format('YYYY-MM-DD'));
     }
   }, [selectedDate]);
 
@@ -63,39 +78,9 @@ const ReCheck = () => {
     }
   };
 
-  const save = async (id, appointmentStatus) => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        throw new Error('No access token found');
-      }
-
-      const response = await axios.put(
-        `${process.env.REACT_APP_API_BASE_URL}/appointment/staff-update-customer-appointment/${id}`,
-        {},
-        {
-          params: {
-            appointmentStatus: appointmentStatus,
-          },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      message.success('Status updated successfully');
-      if (selectedDate) {
-        fetchData(pagination.current, pagination.pageSize, moment(selectedDate).format('YYYY-MM-DD'));
-      }
-    } catch (error) {
-      message.error('Failed to update status');
-      console.error('Failed to update status:', error);
-    }
-  };
-
   const handleTableChange = (pagination) => {
     if (selectedDate) {
-      fetchData(pagination.current, pagination.pageSize, moment(selectedDate).format('YYYY-MM-DD'));
+      fetchData(pagination.current, pagination.pageSize, selectedDate.format('YYYY-MM-DD'));
     }
   };
 
@@ -111,6 +96,69 @@ const ReCheck = () => {
   const handleModalClose = () => {
     setIsModalVisible(false);
     setSelectedAppointment(null);
+  };
+
+  const handlePayment = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        throw new Error('No access token found');
+      }
+
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/appointment/staff-create-treatment-payment/${selectedAppointment.id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const { data } = response.data;
+      message.success('Đã thanh toán thành công!');
+
+      // Redirect to the payment URL
+      window.location.href = data.url;
+
+      // Optionally, refresh data or perform any necessary actions after payment
+      fetchData(pagination.current, pagination.pageSize, selectedDate.format('YYYY-MM-DD'));
+    } catch (error) {
+      message.error('Failed to process payment');
+      console.error('Failed to process payment:', error);
+    }
+  };
+
+  const handleStatusChange = async (meetingId, newStatus) => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        throw new Error('No access token found');
+      }
+
+      const response = await axios.put(
+        `${process.env.REACT_APP_API_BASE_URL}/meeting/update-meeting-status/${meetingId}?status=${newStatus}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      message.success('Status updated successfully');
+      handleModalClose(); // Close the modal after success
+      fetchData(pagination.current, pagination.pageSize, selectedDate.format('YYYY-MM-DD'));
+    } catch (error) {
+      message.error('Failed to update status');
+      console.error('Failed to update status:', error);
+    }
+  };
+
+  const handleAddDentist = (meetingId) => {
+    // Implement your logic to add a dentist for the specified meeting
+    console.log(`Adding dentist for meeting ID ${meetingId}`);
+    // Example: You might open a new modal or perform an action to add a dentist
   };
 
   const columns = [
@@ -153,13 +201,7 @@ const ReCheck = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status, record) => (
-        <EditableCell
-          record={record}
-          value={status}
-          save={save}
-        />
-      ),
+      render: (status) => statusText[status],
     },
     {
       title: 'Actions',
@@ -170,62 +212,15 @@ const ReCheck = () => {
     },
   ];
 
-  const EditableCell = ({ record, value, save }) => {
-    const [editing, setEditing] = useState(false);
-
-    const toggleEdit = () => {
-      setEditing(!editing);
-    };
-
-    const handleSelectChange = (value) => {
-      save(record.id, value);
-      toggleEdit();
-    };
-
-    return (
-      <td>
-        {editing ? (
-          <Form.Item style={{ margin: 0 }}>
-            <Select
-              defaultValue={value}
-              onChange={handleSelectChange}
-              onBlur={toggleEdit}
-              style={{ width: '100%' }}
-            >
-              <Option value={2}>OnGoing</Option>
-              <Option value={3}>Scheduled</Option>
-              <Option value={4}>Rejected</Option>
-            </Select>
-          </Form.Item>
-        ) : (
-          <div
-            style={{ minHeight: '32px', display: 'flex', alignItems: 'center' }}
-            onClick={toggleEdit}
-          >
-            {statusText[value]}
-          </div>
-        )}
-      </td>
-    );
-  };
-
-  const statusText = {
-    2: 'OnGoing',
-    3: 'Scheduled',
-    4: 'Rejected',
-  };
-
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
         <span style={{ marginRight: '10px' }}>Ngày:</span>
         <DatePicker
-          selected={selectedDate}
+          value={selectedDate}
           onChange={handleDateChange}
-          dateFormat="yyyy-MM-dd"
+          format="YYYY-MM-DD"
           style={{ margin: '10px' }}
-          className="custom-datepicker"
-          customInput={<input style={{ border: '1px solid #d9d9d9', borderRadius: '4px', padding: '5px 10px', width: '100%' }} />}
         />
       </div>
       <Table
@@ -237,49 +232,16 @@ const ReCheck = () => {
         rowKey="id"
         style={{ marginTop: '20px' }}
       />
-<Modal
-  title="Appointment Details"
-  visible={isModalVisible}
-  onCancel={handleModalClose}
-  footer={null}
-  style={{ minWidth: '600px' }}
->
-  {selectedAppointment && (
-    <div>
-        <div style={{ display: 'grid', gridTemplateColumns: '4fr 3fr', gap: '120px', marginBottom:'20px' }}>
-      <div>
-        <div><strong>ID:</strong> {selectedAppointment.id}</div>
-        <div><strong>Booking Date:</strong> {selectedAppointment.date}</div>
-        <div><strong>User Account Name:</strong> {selectedAppointment.userAccountName}</div>
-        <div><strong>Patient Name:</strong> {selectedAppointment.patientName}</div>
-      </div>
-      <div>
-        <div><strong>Slot Name:</strong> {selectedAppointment.slotName}</div>
-        <div><strong>Start Time:</strong> {selectedAppointment.startAt}</div>
-        <div><strong>End Time:</strong> {selectedAppointment.endAt}</div>
-        <div><strong>Status:</strong> {statusText[selectedAppointment.status]}</div>
-      </div>
-    </div>
-      {/* <div><strong>Additional Information:</strong> </div> */}
-      <div><strong>Appointment Services:</strong></div>
-      {selectedAppointment.appointmentServices.map(service => (
-        <div key={service.id} style={{ marginBottom: '10px', paddingLeft: '10px', borderLeft: '2px solid #1890ff' }}>
-          <p>
-            <strong>{service.serviceName}</strong> - {service.servicePrice}
-          </p>
-          <p style={{ marginBottom: '5px' }}><strong>Meetings:</strong></p>
-          {service.meetings.map(meeting => (
-            <div key={meeting.id} style={{ marginBottom: '5px', paddingLeft: '10px', borderLeft: '2px solid #fadb14' }}>
-              Date: {meeting.date}
-            </div>
-          ))}
-        </div>
-      ))}
-    </div>
-  )}
-</Modal>
-
-
+      <AppointmentDetailModal
+        isModalVisible={isModalVisible}
+        handleModalClose={handleModalClose}
+        selectedAppointment={selectedAppointment}
+        handlePayment={handlePayment}
+        handleStatusChange={handleStatusChange}
+        handleAddDentist={handleAddDentist}
+        meetingStatusText={meetingStatusText}
+        fetchAppointmentDetails={fetchData} // Pass the fetchData function to the modal
+      />
     </div>
   );
 };

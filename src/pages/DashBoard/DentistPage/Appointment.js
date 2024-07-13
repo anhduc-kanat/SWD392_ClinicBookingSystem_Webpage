@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, message, Form, Input, Select, DatePicker } from 'antd';
 import axios from 'axios';
-import moment from 'moment';
 const { Option } = Select;
 
 const Appointment = () => {
@@ -28,14 +27,7 @@ const Appointment = () => {
   });
   const [serviceOptions, setServiceOptions] = useState([]);
 
-  const getCurrentDate = () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
+  // Fetch data for appointments
   const fetchData = async (page, size) => {
     setLoading(true);
     try {
@@ -62,6 +54,7 @@ const Appointment = () => {
     }
   };
 
+  // Fetch appointment details by ID
   const fetchAppointmentDetails = async (id) => {
     try {
       const accessToken = localStorage.getItem('accessToken');
@@ -80,6 +73,7 @@ const Appointment = () => {
     }
   };
 
+  // Fetch service options for Select dropdown
   const fetchServiceOptions = async () => {
     try {
       const accessToken = localStorage.getItem('accessToken');
@@ -102,20 +96,33 @@ const Appointment = () => {
     fetchServiceOptions();
   }, [pageNumber, pageSize]);
 
+  // Function to get current date in 'YYYY-MM-DD' format
+  const getCurrentDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // Handle pagination and table change
   const handleTableChange = (pagination) => {
     setPageNumber(pagination.current);
     setPageSize(pagination.pageSize);
   };
 
+  // View appointment details modal
   const handleViewDetails = (record) => {
     fetchAppointmentDetails(record.id);
   };
 
+  // Add service modal
   const handleAddService = (record) => {
     setCurrentRecord(record);
     setServiceModalVisible(true);
   };
 
+  // Add note modal
   const handleAddNote = (record) => {
     const appointmentBusinessServiceId = record.appointmentServices.length > 0 ? record.appointmentServices[0].id : null;
     setCurrentRecord(record);
@@ -128,6 +135,7 @@ const Appointment = () => {
     setNoteModalVisible(true);
   };
 
+  // Cancel adding service modal
   const handleServiceModalCancel = () => {
     setServiceModalVisible(false);
     setServiceInfo({
@@ -137,6 +145,7 @@ const Appointment = () => {
     });
   };
 
+  // Cancel adding note modal
   const handleNoteModalCancel = () => {
     setNoteModalVisible(false);
     setNoteInfo({
@@ -147,6 +156,7 @@ const Appointment = () => {
     });
   };
 
+  // Handle service selection change in modal
   const handleServiceInfoChange = (value, option) => {
     setServiceInfo(prevState => ({
       ...prevState,
@@ -154,6 +164,7 @@ const Appointment = () => {
     }));
   };
 
+  // Handle service date change in modal
   const handleServiceDateChange = (date, dateString) => {
     setServiceInfo(prevState => ({
       ...prevState,
@@ -161,6 +172,7 @@ const Appointment = () => {
     }));
   };
 
+  // Handle note content change
   const handleNoteContentChange = (e) => {
     setNoteInfo(prevState => ({
       ...prevState,
@@ -176,12 +188,8 @@ const Appointment = () => {
         [
           {
             businessServiceId: serviceInfo.businessServiceId,
-            meetings: [
-              {
-                date: serviceInfo.serviceDate,
-              },
-            ],
-          },
+            meetings: [{ date: serviceInfo.serviceDate }],
+          }
         ],
         {
           headers: {
@@ -191,12 +199,15 @@ const Appointment = () => {
       );
       message.success('Service added successfully');
       setServiceModalVisible(false);
-      window.location.reload();
+      window.location.reload(); // Reload the page after successful addition
     } catch (error) {
       message.error('Failed to add service');
     }
   };
+  
+  
 
+  // Save note function
   const handleSaveNote = async () => {
     try {
       const accessToken = localStorage.getItem('accessToken');
@@ -216,12 +227,13 @@ const Appointment = () => {
       );
       message.success('Note added successfully');
       setNoteModalVisible(false);
-      window.location.reload();
+      window.location.reload(); // Consider a more reactive update instead of full reload
     } catch (error) {
       message.error('Failed to add note');
     }
   };
 
+  // Columns configuration for Ant Design Table
   const columns = [
     {
       title: 'Appointment ID',
@@ -253,11 +265,11 @@ const Appointment = () => {
       title: 'Action',
       key: 'action',
       render: (text, record) => (
-        <>
+        <div style={{ display: 'flex' }}>
           <Button onClick={() => handleViewDetails(record)}>View Details</Button>
-          <Button onClick={() => handleAddService(record)} style={{ marginLeft: '10px' }}>Add Service</Button>
-          <Button onClick={() => handleAddNote(record)} style={{ marginLeft: '10px' }}>Add Note</Button>
-        </>
+          <Button onClick={() => handleAddService(record)} style={{ marginLeft: '10px', marginRight: '10px' }}>Add Service</Button>
+          <Button onClick={() => handleAddNote(record)}>Add Note</Button>
+        </div>
       ),
     },
   ];
@@ -278,82 +290,90 @@ const Appointment = () => {
         onChange={handleTableChange}
       />
 
-<Modal
-  title="Appointment Details"
-  visible={modalVisible}
-  onCancel={() => setModalVisible(false)}
-  footer={null}
->
-  {appointmentDetails ? (
-    <div>
-      <p><strong>ID:</strong> {appointmentDetails.id}</p>
-      <p><strong>Date:</strong> {appointmentDetails.date}</p>
-      <p><strong>Status:</strong> {appointmentDetails.status}</p>
-      <p><strong>Patient Name:</strong> {appointmentDetails.patientName}</p>
-      <p><strong>Patient Phone Number:</strong> {appointmentDetails.patientPhoneNumber}</p>
-      <p><strong>Patient Address:</strong> {appointmentDetails.patientAddress}</p>
-      <p><strong>Patient Date of Birth:</strong> {appointmentDetails.patientDateOfBirth}</p>
-      <p><strong>Slot Name:</strong> {appointmentDetails.slotName}</p>
-      <p><strong>Result Notes:</strong></p>
-      <ul>
-        {appointmentDetails.result && appointmentDetails.result.notes.length > 0 ? (
-          appointmentDetails.result.notes.map(note => (
-            <li key={note.id}>
-              {note.content} by {note.dentistName} for {note.serviceName}
-            </li>
-          ))
-        ) : (
-          <p>No notes available</p>
-        )}
-      </ul>
-      <p><strong>Appointment Services:</strong></p>
-      <ul>
-        {appointmentDetails.appointmentServices.map(service => (
-          <li key={service.id}>
-            {service.serviceName} - {service.meetings.map(meeting => meeting.date).join(', ')}
-          </li>
-        ))}
-      </ul>
-    </div>
-  ) : (
-    <p>Loading...</p>
-  )}
-</Modal>
+      {/* Appointment Details Modal */}
+      <Modal
+        title="Appointment Details"
+        visible={modalVisible}
+        onCancel={() => setModalVisible(false)}
+        footer={null}
+      >
+        {appointmentDetails ? (
+          <div>
+            <p><strong>ID:</strong> {appointmentDetails.id}</p>
+            <p><strong>Date:</strong> {appointmentDetails.date}</p>
+            <p><strong>Status:</strong> {appointmentDetails.status}</p>
+            <p><strong>Patient Name:</strong> {appointmentDetails.patientName}</p>
+            <p><strong>Patient Phone Number:</strong> {appointmentDetails.patientPhoneNumber}</p>
+            <p><strong>Patient Address:</strong> {appointmentDetails.patientAddress}</p>
+            <p><strong>Slot Name:</strong> {appointmentDetails.slotName}</p>
+            <p><strong>Appointment Services:</strong></p>
+            <ul>
+              {appointmentDetails.appointmentServices.map(service => (
+                <li key={service.id}>
+                  {service.serviceName} - {service.meetings.join(', ')} {/* Display arraystringdate format */}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+      </Modal>
 
-
+      {/* Add Service Modal */}
       <Modal
         title="Add Service"
         visible={serviceModalVisible}
         onCancel={handleServiceModalCancel}
-        onOk={handleSaveService}
+        footer={[
+          <Button key="cancel" onClick={handleServiceModalCancel}>
+            Cancel
+          </Button>,
+          <Button key="save" type="primary" onClick={handleSaveService}>
+            Save
+          </Button>,
+        ]}
       >
         <Form layout="vertical">
           <Form.Item label="Select Service">
             <Select
-              value={serviceInfo.businessServiceId}
-              onChange={handleServiceInfoChange}
               placeholder="Select a service"
+              onChange={handleServiceInfoChange}
+              style={{ width: '100%' }}
             >
               {serviceOptions.map(service => (
-                <Option key={service.id} value={service.id}>{service.name}</Option>
+                <Option key={service.id}>{service.name}</Option>
               ))}
             </Select>
           </Form.Item>
           <Form.Item label="Select Date">
-            <DatePicker onChange={handleServiceDateChange} />
+            <DatePicker
+              onChange={handleServiceDateChange}
+              style={{ width: '100%' }}
+            />
           </Form.Item>
         </Form>
       </Modal>
 
+      {/* Add Note Modal */}
       <Modal
         title="Add Note"
         visible={noteModalVisible}
         onCancel={handleNoteModalCancel}
-        onOk={handleSaveNote}
+        footer={[
+          <Button key="cancel" onClick={handleNoteModalCancel}>
+            Cancel
+          </Button>,
+          <Button key="save" type="primary" onClick={handleSaveNote}>
+            Save
+          </Button>,
+        ]}
       >
         <Form layout="vertical">
-          <Form.Item label="Note">
-            <Input.TextArea value={noteInfo.content} onChange={handleNoteContentChange} />
+          <Form.Item label="Note Content">
+            <Input.TextArea
+              rows={4}
+              value={noteInfo.content}
+              onChange={handleNoteContentChange}
+            />
           </Form.Item>
         </Form>
       </Modal>

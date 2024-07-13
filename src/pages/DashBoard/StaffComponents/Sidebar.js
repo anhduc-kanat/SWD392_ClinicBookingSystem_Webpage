@@ -44,11 +44,11 @@ const Sidebar = () => {
                 Re-Check
               </NavLink>
             </li>
-            <li>
+            {/* <li>
               <NavLink to="/staff/check-in" className={selectedKey === '/staff/check-in' ? 'active-link' : ''}>
                 Check-in
               </NavLink>
-            </li>
+            </li> */}
             <li>
               <NavLink to="/staff/user-info" className={selectedKey === '/staff/user-info' ? 'active-link' : ''}>
                 Thông tin người dùng
@@ -57,7 +57,7 @@ const Sidebar = () => {
 
             <li>
               <NavLink to="/staff/payment" className={selectedKey === '/staff/payment' ? 'active-link' : ''}>
-                Thanh toán
+                Lịch sử thanh toán
               </NavLink>
             </li>
           </ul>

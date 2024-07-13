@@ -28,13 +28,13 @@ const LoginPage = () => {
       // Redirect to dashboard or appropriate page based on role
       switch (response.data.data.role) {
         case 'STAFF':
-          navigate('/staff/user-infor');
+          navigate('/staff/re-check');
           break;
         case 'CUSTOMER':
           navigate('/customer/user-info');
           break;
         case 'DENTIST':
-          navigate('/dentist/user-info');
+          navigate('/dentist/appointment');
           break;
         case 'ADMIN':
           navigate('/clinicowner/dentist');

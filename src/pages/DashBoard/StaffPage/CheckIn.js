@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Form, Select, message, Button, Modal } from 'antd';
+import { Table, Tag, message, Select, DatePicker } from 'antd';
 import axios from 'axios';
-import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css";
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 const { Option } = Select;
 
@@ -12,27 +10,20 @@ const CheckIn = () => {
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 10,
+    pageSize: 1000,
     total: 0,
   });
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
+
+  const [selectedDate, setSelectedDate] = useState(dayjs().format('YYYY-MM-DD')); // Set to current date
 
   useEffect(() => {
-    if (selectedDate) {
-      fetchData(pagination.current, pagination.pageSize, moment(selectedDate).format('YYYY-MM-DD'));
-    }
+    fetchData(pagination.current, pagination.pageSize, selectedDate);
   }, [selectedDate]);
 
   const fetchData = async (pageNumber, pageSize, date) => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        throw new Error('No access token found');
-      }
-
+      const accessToken = localStorage.getItem('accessToken');
       const response = await axios.get(
         `${process.env.REACT_APP_API_BASE_URL}/appointment/staff-get-appointment-by-date`,
         {
@@ -42,181 +33,137 @@ const CheckIn = () => {
             date: date,
           },
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
 
       const { data } = response.data;
-      // Modify data to get status from meetings
-      const modifiedData = data.map(appointment => ({
-        ...appointment,
-        status: appointment.appointmentServices.length > 0 ? appointment.appointmentServices[0].meetings[0].status : appointment.status,
-      }));
-
-      setData(modifiedData);
+      setData(data);
       setPagination({
         current: response.data.pageNumber,
         pageSize: response.data.pageSize,
         total: response.data.totalRecords,
       });
-      message.success(response.data.message);
     } catch (error) {
-      message.error('Failed to fetch data');
       console.error('Failed to fetch data:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const save = async (id, appointmentStatus) => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        throw new Error('No access token found');
-      }
+  const handleTableChange = (pagination) => {
+    fetchData(pagination.current, pagination.pageSize, selectedDate);
+  };
 
+  const handleDateChange = (date, dateString) => {
+    setSelectedDate(dateString);
+  };
+
+  const renderStatusTag = (status) => {
+    switch (status) {
+      case 1:
+        return <Tag color="blue">Done</Tag>;
+      case 2:
+        return <Tag color="green">CheckIn</Tag>;
+      case 3:
+        return <Tag color="yellow">Waiting</Tag>;
+      case 4:
+        return <Tag color="purple">Future</Tag>;
+      default:
+        return null;
+    }
+  };
+
+  const updateMeetingStatus = async (meetingId, newStatus) => {
+    try {
+      const accessToken = localStorage.getItem('accessToken');
       const response = await axios.put(
-        `${process.env.REACT_APP_API_BASE_URL}/appointment/staff-update-customer-appointment/${id}`,
+        `${process.env.REACT_APP_API_BASE_URL}/meeting/update-meeting-status/${meetingId}?status=${newStatus}`,
         {},
         {
-          params: {
-            appointmentStatus: appointmentStatus,
-          },
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
 
-      message.success('Status updated successfully');
-      if (selectedDate) {
-        fetchData(pagination.current, pagination.pageSize, moment(selectedDate).format('YYYY-MM-DD'));
+      if (response.status === 200) {
+        message.success('Meeting status updated successfully');
+        // Refresh data after update
+        fetchData(pagination.current, pagination.pageSize, selectedDate);
       }
     } catch (error) {
-      message.error('Failed to update status');
-      console.error('Failed to update status:', error);
+      console.error('Failed to update meeting status:', error);
+      message.error('Failed to update meeting status');
     }
   };
 
-  const handleTableChange = (pagination) => {
-    if (selectedDate) {
-      fetchData(pagination.current, pagination.pageSize, moment(selectedDate).format('YYYY-MM-DD'));
-    }
-  };
-
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-  };
-
-  const handleViewDetail = (record) => {
-    setSelectedAppointment(record);
-    setIsModalVisible(true);
-  };
-
-  const handleModalClose = () => {
-    setIsModalVisible(false);
-    setSelectedAppointment(null);
+  const handleStatusChange = (meetingId, newStatus) => {
+    updateMeetingStatus(meetingId, newStatus);
   };
 
   const columns = [
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status, record) => (
-        <EditableCell
-          record={record}
-          value={status}
-          save={save}
-        />
-      ),
-    },
-    {
-      title: 'Actions',
-      key: 'actions',
-      render: (text, record) => (
-        <Button onClick={() => handleViewDetail(record)}>View Detail</Button>
-      ),
-    },
-    {
-      title: 'Meetings',
+      title: 'Meeting ID',
       dataIndex: 'appointmentServices',
-      key: 'meetings',
-      render: (appointmentServices) => (
-        <>
-          {appointmentServices.map(service => (
-            <div key={service.id}>
-              {service.meetings.map(meeting => (
-                <div key={meeting.id}>
-                  Date: {meeting.date} - Status: {meeting.status}
-                </div>
-              ))}
+      key: 'appointmentServices',
+      render: (appointmentServices) =>
+        appointmentServices.map((service) =>
+          service.meetings.map((meeting) => (
+            <div key={meeting.id}>
+              <p>{meeting.id}</p>
             </div>
-          ))}
-        </>
-      ),
+          ))
+        ),
+    },
+    {
+      title: 'Meeting Status',
+      dataIndex: 'appointmentServices',
+      key: 'appointmentServices',
+      render: (appointmentServices) =>
+        appointmentServices.map((service) =>
+          service.meetings.map((meeting) => (
+            <div key={meeting.id}>
+              {renderStatusTag(meeting.status)}
+              <br />
+              <Select
+                defaultValue={meeting.status.toString()} // Default value should be the current status
+                style={{ width: 120 }}
+                onChange={(value) => handleStatusChange(meeting.id, parseInt(value))}
+              >
+                <Option value="1">Done</Option>
+                <Option value="2">CheckIn</Option>
+                <Option value="3">Waiting</Option>
+                <Option value="4">Future</Option>
+              </Select>
+            </div>
+          ))
+        ),
+    },
+    {
+      title: 'Dentist Name',
+      dataIndex: 'appointmentServices',
+      key: 'appointmentServices',
+      render: (appointmentServices) =>
+        appointmentServices.map((service) =>
+          service.meetings.map((meeting) => (
+            <div key={meeting.id}>
+              <p>{meeting.dentistName}</p>
+            </div>
+          ))
+        ),
     },
   ];
 
-  const EditableCell = ({ record, value, save }) => {
-    const [editing, setEditing] = useState(false);
-
-    const toggleEdit = () => {
-      setEditing(!editing);
-    };
-
-    const handleSelectChange = (value) => {
-      save(record.id, value);
-      toggleEdit();
-    };
-
-    return (
-      <td>
-        {editing ? (
-          <Form.Item style={{ margin: 0 }}>
-            <Select
-              defaultValue={value}
-              onChange={handleSelectChange}
-              onBlur={toggleEdit}
-              style={{ width: '100%' }}
-            >
-              <Option value={2}>OnGoing</Option>
-              <Option value={3}>Scheduled</Option>
-              <Option value={4}>Rejected</Option>
-            </Select>
-          </Form.Item>
-        ) : (
-          <div
-            style={{ minHeight: '32px', display: 'flex', alignItems: 'center' }}
-            onClick={toggleEdit}
-          >
-            {statusText[value]}
-          </div>
-        )}
-      </td>
-    );
-  };
-
-  const statusText = {
-    2: 'OnGoing',
-    3: 'Scheduled',
-    4: 'Rejected',
-  };
-
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-        <span style={{ marginRight: '10px' }}>Ngày:</span>
-        <DatePicker
-          selected={selectedDate}
-          onChange={handleDateChange}
-          dateFormat="yyyy-MM-dd"
-          style={{ margin: '10px' }}
-          className="custom-datepicker"
-          customInput={<input style={{ border: '1px solid #d9d9d9', borderRadius: '4px', padding: '5px 10px', width: '100%' }} />}
-        />
-      </div>
+      {/* <h1>Appointments for {selectedDate}</h1> */}
+     Ngày: <DatePicker
+        value={dayjs(selectedDate)}
+        onChange={handleDateChange}
+        format='YYYY-MM-DD'
+      />
       <Table
         columns={columns}
         dataSource={data}
@@ -224,46 +171,7 @@ const CheckIn = () => {
         loading={loading}
         onChange={handleTableChange}
         rowKey="id"
-        style={{ marginTop: '20px' }}
       />
-      <Modal
-        title="Appointment Details"
-        visible={isModalVisible}
-        onCancel={handleModalClose}
-        footer={null}
-        style={{ minWidth: '600px' }}
-      >
-        {selectedAppointment && (
-          <div>
-            <div style={{ marginBottom: '20px' }}>
-              <div><strong>ID:</strong> {selectedAppointment.id}</div>
-              <div><strong>Booking Date:</strong> {selectedAppointment.date}</div>
-              <div><strong>User Account Name:</strong> {selectedAppointment.userAccountName}</div>
-              <div><strong>Patient Name:</strong> {selectedAppointment.patientName}</div>
-              <div><strong>Slot Name:</strong> {selectedAppointment.slotName}</div>
-              <div><strong>Start Time:</strong> {selectedAppointment.startAt}</div>
-              <div><strong>End Time:</strong> {selectedAppointment.endAt}</div>
-              <div><strong>Status:</strong> {statusText[selectedAppointment.status]}</div>
-            </div>
-            <div><strong>Appointment Services:</strong></div>
-            {selectedAppointment.appointmentServices.map(service => (
-              <div key={service.id} style={{ marginBottom: '10px', paddingLeft: '10px', borderLeft: '2px solid #1890ff' }}>
-                <p>
-                  <strong>{service.serviceName}</strong> - {service.servicePrice}
-                </p>
-                <p style={{ marginLeft: '20px' }}>
-                  <strong>Meetings:</strong>
-                  {service.meetings.map(meeting => (
-                    <span key={meeting.id} style={{ marginLeft: '10px' }}>
-                      Date: {meeting.date} - Status: {meeting.status}
-                    </span>
-                  ))}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </Modal>
     </div>
   );
 };
