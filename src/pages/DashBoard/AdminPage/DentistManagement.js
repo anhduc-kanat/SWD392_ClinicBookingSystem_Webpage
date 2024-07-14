@@ -10,8 +10,7 @@ const { Option } = Select;
 const DentistManagement = () => {
     const [dentists, setDentists] = useState([]);
     const [services, setServices] = useState([]);
-    const [selectedService, setSelectedService] = useState(null);
-    const [addedServices, setAddedServices] = useState([]);
+    const [selectedServices, setSelectedServices] = useState([]);
     const [pagination, setPagination] = useState({
         current: 1,
         pageSize: 5,
@@ -66,13 +65,13 @@ const DentistManagement = () => {
             const values = await form.validateFields();
             const dentistData = {
                 ...values,
-                servicesId: addedServices.map(service => service.id),
+                servicesId: selectedServices,
             };
             await axios.post(`${process.env.REACT_APP_API_BASE_URL}/dentist/create-dentist`, dentistData);
             fetchDentists(); // Refresh the list after creating a new dentist
             setIsModalVisible(false);
             form.resetFields();
-            setAddedServices([]);
+            setSelectedServices([]);
         } catch (error) {
             console.log("Error at create dentist: ", error.message);
         }
@@ -81,16 +80,19 @@ const DentistManagement = () => {
     const handleCancel = () => {
         setIsModalVisible(false);
         form.resetFields();
-        setAddedServices([]);
+        setSelectedServices([]);
     };
 
     const handleEdit = (dentist) => {
         setSelectedDentist(dentist);
+        const serviceIds = dentist.services.map(service => service.id);
+        setSelectedServices(serviceIds);
         editForm.setFieldsValue({
             firstName: dentist.firstName,
             lastName: dentist.lastName,
             address: dentist.address,
             dateOfBirth: dentist.dateOfBirth ? moment(dentist.dateOfBirth) : null,
+            servicesId: serviceIds,
         });
         setIsEditModalVisible(true);
     };
@@ -131,6 +133,7 @@ const DentistManagement = () => {
             const updatedDentist = {
                 ...selectedDentist,
                 ...values,
+                servicesId: selectedServices, // Include servicesId in the update
             };
             await axios.put(`${process.env.REACT_APP_API_BASE_URL}/dentist/update-dentist/${selectedDentist.id}`, updatedDentist);
             fetchDentists(); // Refresh the list after updating the dentist
@@ -149,16 +152,7 @@ const DentistManagement = () => {
     };
 
     const handleServiceChange = (value) => {
-        const service = services.find(service => service.id === value);
-        setSelectedService(service);
-    };
-
-    const handleAddService = () => {
-        if (selectedService && !addedServices.find(service => service.id === selectedService.id)) {
-            const newAddedServices = [...addedServices, selectedService];
-            setAddedServices(newAddedServices);
-            form.setFieldsValue({ serviceId: newAddedServices.map(service => service.id) });
-        }
+        setSelectedServices(value);
     };
 
     const paginatedData = dentists.slice(
@@ -288,31 +282,19 @@ const DentistManagement = () => {
                         <DatePicker style={{ width: '100%' }} />
                     </Form.Item>
                     <Form.Item
-                        name="serviceId"
+                        name="servicesId"
                         label="Services"
-                        hidden={true}
-                        rules={[{ required: true, message: 'Please choose and add services!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        label="Services"
+                        rules={[{ required: true, message: 'Please select services!' }]}
                     >
                         <Select
-                            placeholder="Select a service"
+                            mode="multiple"
+                            placeholder="Select services"
                             onChange={handleServiceChange}
                         >
                             {services.map(service => (
                                 <Option key={service.id} value={service.id}>{service.name}</Option>
                             ))}
                         </Select>
-                        <Button type="primary" onClick={handleAddService} style={{ display: 'flex', margin: '10px auto' }}>Add Service</Button>
-                        <div className="add-service-div">
-                            <h3>Services for this dentist</h3>
-                            {addedServices.map(service => (
-                                <p key={service.id} className="added-service">{service.name}</p>
-                            ))}
-                        </div>
                     </Form.Item>
                 </Form>
             </Modal>
@@ -355,6 +337,22 @@ const DentistManagement = () => {
                         rules={[{ required: true, message: 'Please input the date of birth!' }]}
                     >
                         <DatePicker style={{ width: '100%' }} />
+                    </Form.Item>
+                    <Form.Item
+                        name="servicesId"
+                        label="Services"
+                        rules={[{ required: true, message: 'Please select services!' }]}
+                    >
+                        <Select
+                            mode="multiple"
+                            placeholder="Select services"
+                            onChange={handleServiceChange}
+                            defaultValue={selectedServices}
+                        >
+                            {services.map(service => (
+                                <Option key={service.id} value={service.id}>{service.name}</Option>
+                            ))}
+                        </Select>
                     </Form.Item>
                 </Form>
             </Modal>

@@ -61,6 +61,15 @@ const Sidebar = () => {
             </li>
           </ul>
         </Panel>
+        <Panel header="Quản lí Ca Làm" style={{ fontSize: '15px', fontWeight: 'bold', fontFamily: 'sans-serif' }} key="4">
+          <ul>
+            <li>
+              <NavLink to="/clinicowner/slot" className={selectedKey === '/clinicowner/slot' ? 'active-link' : ''}>
+                Quản lí Ca làm
+              </NavLink>
+            </li>
+          </ul>
+        </Panel>
       </Collapse>
     </div>
   );
