@@ -65,7 +65,7 @@ const HomePage = () => {
             <img src="/images/Dentist2.png" alt="Patient" className="sub-image" />
           </div>
         </div>
-        <Section>
+        <Section className="trusted-by-section">
           <div style={{ marginTop: '7rem' }}>
             <TrustedBy />
           </div>
@@ -86,7 +86,7 @@ const HomePage = () => {
           </div>
         </Section>
       </Content>
-      <div style={{ marginTop: '7rem' }}>
+      <div >
         <Footer />
       </div>
     </Layout>

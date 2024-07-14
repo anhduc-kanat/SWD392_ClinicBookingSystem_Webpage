@@ -14,7 +14,7 @@ const Feedback = () => {
           </h1>
         </div>
         <div className="grid md:grid-cols-2 gap-8 grid-cols-1 relative reveal-onshow">
-          <div className="p-10 shadow-md rounded-3xl flex flex-col">
+          <div className="p-10 shadow-md rounded-3xl flex flex-col each-feedback">
             <div className="w-full flex gap-3 mb-4 items-center justify-start">
               <img
                 src='/assets/avatar.png'
@@ -34,7 +34,7 @@ const Feedback = () => {
               "Dr. Duc was amazing! He made me feel comfortable throughout the entire appointment and took the time to explain everything clearly. Highly recommend his services."
             </p>
           </div>
-          <div className="p-10 shadow-md rounded-3xl flex flex-col">
+          <div className="p-10 shadow-md rounded-3xl flex flex-col each-feedback">
             <div className="w-full flex gap-3 mb-4 items-center justify-start">
               <img
                src='/assets/avatar2.png'

@@ -4,14 +4,14 @@
     width: 100%;
     top: 0;
     z-index: 1000;
+    border-bottom: 1px solid #ddd;
   }
   
   .homepage-content {
-    padding: 150px;
+    padding: 80px 150px;
     text-align: center;
-    background-color: #dbe0e7;
+    background-color: #eeeeee;
     height: fit-content;
-    border: 2px solid #ccc; /* Add a border around the content */
     margin-top: 64px; /* Adjust the margin-top to account for the fixed header height */
   }
   
@@ -20,6 +20,9 @@
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
+    background-color: #ffffff;
+    padding: 60px;
+    border-radius: 20px;
   }
   
   .intro-text {
@@ -63,3 +66,10 @@
     border: 5px solid white;
   }
   
+
+  .trusted-by-section {
+    background-color: #ffffff;
+    width: 100%;
+    padding: 20px;
+    box-shadow: 2px 4px #ddd;
+  }

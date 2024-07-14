@@ -24,28 +24,28 @@ export default function Services() {
                     </HeaderInfo>
                     <ServiceBoxRow className="flex" style={{ fontSize: '20px' }}>
                         <ServiceBoxWrapper>
-                            <FontAwesomeIcon icon={faTooth} className="iconService iconService1" />
+                            <FontAwesomeIcon icon={faTooth} className="iconService iconService1" color="red" />
                             <div>
                                 <h1>Invisalign</h1>
                                 <p>Invisalign is the best way to straighten your smile without interfering with your day-to-day life.</p>
                             </div>
                         </ServiceBoxWrapper>
                         <ServiceBoxWrapper>
-                            <FontAwesomeIcon icon={faTeeth} className="iconService iconService2" />
+                            <FontAwesomeIcon icon={faTeeth} className="iconService iconService2" color="green" />
                             <div>
                                 <h1>Teeth Cleanings</h1>
                                 <p>The only way to remove tartar is to see a dentist for a professional teeth cleaning.</p>
                             </div>
                         </ServiceBoxWrapper>
                         <ServiceBoxWrapper>
-                            <FontAwesomeIcon icon={faTeethOpen} className="iconService iconService3" />
+                            <FontAwesomeIcon icon={faTeethOpen} className="iconService iconService3" color="orange" />
                             <div>
                                 <h1>Tooth Extractions</h1>
                                 <p>An extraction may be necessary if your tooth is so damaged that it can't be fixed with a dental restoration.</p>
                             </div>
                         </ServiceBoxWrapper>
                         <ServiceBoxWrapper>
-                            <FontAwesomeIcon icon={faGrinSquint} className="iconService iconService4" />
+                            <FontAwesomeIcon icon={faGrinSquint} className="iconService iconService4" color="blue" />
                             <div>
                                 <h1>Dental Bonding</h1>
                                 <p>Dental bonding is a technique used to correct imperfections with your teeth to give you a better-looking smile. </p>
@@ -66,7 +66,7 @@ export default function Services() {
                                     <div style={{ width: "190px" }}>
                                         <FullButton title="Get Started" action={() => alert("clicked")} />
                                     </div>
-                                    <div style={{ width: "190px", marginLeft: "15px" }}>
+                                    <div style={{ width: "190px", marginLeft: "15px", background: "#fff" }}>
                                         <FullButton title="Contact Us" action={() => alert("clicked")} border />
                                     </div>
                                 </ButtonsRow>
@@ -111,7 +111,12 @@ const ServiceBoxRow = styled.div`
 const ServiceBoxWrapper = styled.div`
   width: 20%;
   margin-right: 5%;
-  padding: 80px 0;
+  margin-top: 20px;
+  margin-bottom: 100px;
+  padding: 40px 0;
+  background: #ffffff;
+  box-shadow: 2px 4px #ddd;
+  border-radius: 20px;
   @media (max-width: 860px) {
     width: 100%;
     text-align: center;
