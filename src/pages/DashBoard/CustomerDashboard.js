@@ -10,6 +10,7 @@ import Results from './CustomerPage/Results';
 import Success from './CustomerPage/Success';  // Import the new Success component
 import Fail from './CustomerPage/Fail';  // Import the new Success component
 import './CustomerDashboard.css';
+import UserPaymentHistory from './CustomerPage/UserPaymentHistory';
 
 const CustomerDashboard = () => {
   return (
@@ -25,6 +26,7 @@ const CustomerDashboard = () => {
             <Route path="results" element={<Results />} />
             <Route path="success" element={<Success />} /> 
             <Route path="fail" element={<Fail />} /> 
+            <Route path="user-payment-history" element={<UserPaymentHistory />} />
           </Routes>
         </div>
       </div>
