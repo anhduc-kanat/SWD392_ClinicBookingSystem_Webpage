@@ -107,23 +107,27 @@ const AppointmentDetailModal = ({ isModalVisible, handleModalClose, selectedAppo
                 <div key={meeting.id} style={{ marginBottom: '5px', paddingLeft: '10px', borderLeft: '2px solid #fadb14' }}>
                   <p>ID: {meeting.id}</p>
                   <p>
-  Status:
-  <Select
-    value={meeting.status}
-    onChange={(value) => handleStatusChange(meeting.id, value)}
-    style={{ width: 150, marginLeft: 10 }}
-  >
-    <Select.Option key={meeting.status} value={meeting.status}>
-      {meetingStatusText[meeting.status]}
-    </Select.Option>
-    {meeting.status !== 2 && (
-      <Select.Option key={2} value={2}>
-        {meetingStatusText[2]}
-      </Select.Option>
-    )}
-  </Select>
-</p>
-
+                    Status:
+                    <Select
+                      value={meeting.status}
+                      onChange={(value) => handleStatusChange(meeting.id, value)}
+                      style={{ width: 150, marginLeft: 10 }}
+                    >
+                      <Select.Option key={meeting.status} value={meeting.status}>
+                        {meetingStatusText[meeting.status]}
+                      </Select.Option>
+                      {meeting.status !== 2 && (
+                        <Select.Option key={2} value={2}>
+                          {meetingStatusText[2]}
+                        </Select.Option>
+                      )}
+                      {meeting.status !== 3 && (
+                        <Select.Option key={3} value={3}>
+                          {meetingStatusText[3]}
+                        </Select.Option>
+                      )}
+                    </Select>
+                  </p>
                   <p>Meeting Date: {meeting.date}</p>
                   <p>Dentist: {meeting.dentistName}</p>
                   {!showAddDentistForm && (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, message, Button, DatePicker } from 'antd';
+import { Table, message, Button, DatePicker, Tag } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import AppointmentDetailModal from '../StaffComponents/AppointmentDetailModal'; // Adjust the path based on your file structure
@@ -23,9 +23,9 @@ const ReCheck = () => {
     3: 'Waiting',
     4: 'Future',
     5: 'InQueue',
-    7:'InTreatment'
+    7: 'InTreatment'
   };
- 
+
   const statusText = {
     1: 'Done',
     2: 'OnGoing',
@@ -35,6 +35,17 @@ const ReCheck = () => {
     6: 'OnTreatment',
     7: 'Queued',
     8: 'Waiting',
+  };
+
+  const statusColors = {
+    1: 'green',
+    2: 'blue',
+    3: 'orange',
+    4: 'red',
+    5: 'purple',
+    6: 'cyan',
+    7: 'magenta',
+    8: 'yellow',
   };
 
   useEffect(() => {
@@ -204,7 +215,9 @@ const ReCheck = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => statusText[status],
+      render: (status) => (
+        <Tag color={statusColors[status]}>{statusText[status]}</Tag>
+      ),
     },
     {
       title: 'Actions',
@@ -243,7 +256,6 @@ const ReCheck = () => {
         handleStatusChange={handleStatusChange}
         handleAddDentist={handleAddDentist}
         meetingStatusText={meetingStatusText}
-     
         fetchAppointmentDetails={fetchData} // Pass the fetchData function to the modal
       />
     </div>
