@@ -1,25 +1,29 @@
-// Payment.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table } from 'antd';
+import { Table, message, Spin } from 'antd';
 
 const Payment = () => {
   const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const apiUrl = process.env.REACT_APP_API_BASE_URL + '/transaction/get-all-transaction';
 
+    setLoading(true);
     axios.get(apiUrl)
       .then(response => {
         console.log('API response:', response.data);
-        // Sort transactions by payment date (descending)
         const sortedTransactions = response.data.data.sort((a, b) => new Date(b.payDate) - new Date(a.payDate));
-        setTransactions(sortedTransactions); // Set sorted data to state
+        setTransactions(sortedTransactions);
       })
       .catch(error => {
         console.error('Error fetching data:', error);
+        message.error('Failed to fetch transactions');
+      })
+      .finally(() => {
+        setLoading(false);
       });
-  }, []); // Empty dependency array means useEffect runs once after the initial render
+  }, []);
 
   const columns = [
     {
@@ -41,7 +45,6 @@ const Payment = () => {
       title: 'Payment Date',
       dataIndex: 'payDate',
       key: 'payDate',
-      // Optional: Render date in a formatted way
       render: (text, record) => (
         <span>{new Date(record.payDate).toLocaleDateString()}</span>
       ),
@@ -50,13 +53,25 @@ const Payment = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      render: (text, record) => {
+        const statusMap = {
+          0: 'Cancel',
+          1: 'Success',
+          2: 'Fail'
+        };
+        return <span>{statusMap[record.status]}</span>;
+      },
     },
   ];
 
   return (
     <div>
       <h2>Payment Page</h2>
-      <Table columns={columns} dataSource={transactions} />
+      {loading ? (
+        <Spin size="large" />
+      ) : (
+        <Table columns={columns} dataSource={transactions} />
+      )}
     </div>
   );
 };

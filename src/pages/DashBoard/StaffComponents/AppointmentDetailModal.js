@@ -8,7 +8,9 @@ const AppointmentDetailModal = ({ isModalVisible, handleModalClose, selectedAppo
   const [businessServiceId, setBusinessServiceId] = useState(null);
   const [dentistOptions, setDentistOptions] = useState([]);
   const [meetingId, setMeetingId] = useState(null);
-
+  const handleCheckIn = (id) => {
+    handleStatusChange(id, 2);
+  };
   useEffect(() => {
     if (businessServiceId) {
       axios.get(`https://api-swd.zouzoumanagement.xyz/api/dentist/get-dentist-service/${businessServiceId}`)
@@ -105,19 +107,23 @@ const AppointmentDetailModal = ({ isModalVisible, handleModalClose, selectedAppo
                 <div key={meeting.id} style={{ marginBottom: '5px', paddingLeft: '10px', borderLeft: '2px solid #fadb14' }}>
                   <p>ID: {meeting.id}</p>
                   <p>
-                    Status:
-                    <Select
-                      value={meeting.status}
-                      onChange={(value) => handleStatusChange(meeting.id, value)}
-                      style={{ width: 150 }}
-                    >
-                      {Object.keys(meetingStatusText).map(statusKey => (
-                        <Select.Option key={statusKey} value={Number(statusKey)}>
-                          {meetingStatusText[statusKey]}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  </p>
+  Status:
+  <Select
+    value={meeting.status}
+    onChange={(value) => handleStatusChange(meeting.id, value)}
+    style={{ width: 150, marginLeft: 10 }}
+  >
+    <Select.Option key={meeting.status} value={meeting.status}>
+      {meetingStatusText[meeting.status]}
+    </Select.Option>
+    {meeting.status !== 2 && (
+      <Select.Option key={2} value={2}>
+        {meetingStatusText[2]}
+      </Select.Option>
+    )}
+  </Select>
+</p>
+
                   <p>Meeting Date: {meeting.date}</p>
                   <p>Dentist: {meeting.dentistName}</p>
                   {!showAddDentistForm && (

@@ -22,8 +22,10 @@ const ReCheck = () => {
     2: 'CheckIn',
     3: 'Waiting',
     4: 'Future',
-    5: 'InQueue'
+    5: 'InQueue',
+    7:'InTreatment'
   };
+ 
   const statusText = {
     1: 'Done',
     2: 'OnGoing',
@@ -241,6 +243,7 @@ const ReCheck = () => {
         handleStatusChange={handleStatusChange}
         handleAddDentist={handleAddDentist}
         meetingStatusText={meetingStatusText}
+     
         fetchAppointmentDetails={fetchData} // Pass the fetchData function to the modal
       />
     </div>

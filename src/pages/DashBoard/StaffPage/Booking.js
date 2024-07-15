@@ -23,13 +23,10 @@ const Booking = () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/service/get-all-services`);
         const services = response.data.data;
-        const options = services.map(service => {
-          const serviceTypeLabel = service.serviceType === 1 ? 'Khám bệnh' : service.serviceType === 2 ? 'điều trị' : 'unknown';
-          return {
-            label: `${service.name} (${serviceTypeLabel})`,
-            value: service.id
-          };
-        });
+        const options = services.map(service => ({
+          label: `${service.name} (${service.serviceType})`,
+          value: service.id
+        }));
         setServiceOptions(options);
       } catch (error) {
         console.error('Failed to fetch services:', error);
@@ -38,7 +35,6 @@ const Booking = () => {
   
     fetchServices();
   }, []);
-  
 
   useEffect(() => {
     if (selectedService) {
@@ -92,7 +88,7 @@ const Booking = () => {
         });
         const users = response.data.data;
         const options = users.map(user => ({
-          label: `${user.firstName} ${user.lastName}`,
+          label: `${user.firstName} ${user.lastName} - ${user.phoneNumber}`,
           value: user.id
         }));
         setUserOptions(options);
@@ -242,15 +238,21 @@ const Booking = () => {
             rules={[{ required: true, message: 'Please select the user!' }]}
           >
             <Select
-              options={userOptions}
+              showSearch  // Enable search functionality
+              optionFilterProp="label"  // Search by option's label
+              filterOption={(input, option) =>
+                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
               onChange={(value) => {
-                setSelectedUserAccountId(value); // Update selectedUserAccountId when user is changed
-                form.setFieldsValue({ patientId: null }); // Reset patientId when user changes
+                setSelectedUserAccountId(value); 
+                form.setFieldsValue({ patientId: null }); 
               }}
+              options={userOptions}
+              placeholder="Search to select user"
             />
           </Form.Item>
           <Form.Item
-            label="Patient" // New field label
+            label="Patient"
             name="patientId"
             rules={[{ required: true, message: 'Please select the patient!' }]}
           >

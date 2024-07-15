@@ -190,7 +190,7 @@ const UserProfile = () => {
                   </Form.Item>
                 </Col>
               </Row>
-              <Row gutter={16}>
+              {/* <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item label="CCCD">
                     <Input value={user.cccd} readOnly />
@@ -201,7 +201,7 @@ const UserProfile = () => {
                     <Input value={user.groupId} readOnly />
                   </Form.Item>
                 </Col>
-              </Row>
+              </Row> */}
               <Button type="link" onClick={() => handleEdit(user)}>Edit</Button>
               <Button type="link" danger onClick={() => showDeleteConfirm(user.id)}>Delete</Button>
             </Form>
@@ -299,7 +299,7 @@ const UserProfile = () => {
               </Form.Item>
             </Col>
           </Row>
-          <Row gutter={16}>
+          {/* <Row gutter={16}>
             <Col span={12}>
               <Form.Item label="CCCD">
                 <Input
@@ -316,7 +316,7 @@ const UserProfile = () => {
                 />
               </Form.Item>
             </Col>
-          </Row>
+          </Row> */}
         </Form>
       </Modal>
 
@@ -410,7 +410,7 @@ const UserProfile = () => {
               </Form.Item>
             </Col>
           </Row>
-          <Row gutter={16}>
+          {/* <Row gutter={16}>
             <Col span={12}>
               <Form.Item label="CCCD">
                 <Input
@@ -427,7 +427,7 @@ const UserProfile = () => {
                 />
               </Form.Item>
             </Col>
-          </Row>
+          </Row> */}
         </Form>
       </Modal>
     </>

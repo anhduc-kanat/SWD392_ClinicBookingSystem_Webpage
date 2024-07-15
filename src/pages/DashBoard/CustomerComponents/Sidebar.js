@@ -53,11 +53,11 @@ const Sidebar = () => {
                 Hồ sơ người dùng
               </NavLink>
             </li>
-            <li>
+            {/* <li>
               <NavLink to="/customer/results" className={selectedKey === '/customer/results' ? 'active-link' : ''}>
                 Kết quả
               </NavLink>
-            </li>
+            </li> */}
             <li>
               <NavLink to="/customer/user-payment-history" className={selectedKey === '/customer/user-payment-history' ? 'active-link' : ''}>
                 Lịch sử giao dịch

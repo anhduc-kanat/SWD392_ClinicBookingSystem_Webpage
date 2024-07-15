@@ -200,11 +200,11 @@ const Appointment = () => {
       );
 
       if (response.status === 200) {
-        message.success('Meeting marked as done successfully');
+        message.success('Đã hoàn thành!');
         setDoneMeetings((prevDoneMeetings) => [...prevDoneMeetings, meetingId]);
       }
     } catch (error) {
-      message.error('Failed to mark the meeting as done');
+      message.error('Vui lòng chọn đúng dịch vụ ban đang làm');
       console.error(error);
     }
   };
@@ -320,44 +320,51 @@ const Appointment = () => {
       />
 
       {/* Appointment Details Modal */}
-      <Modal
-        title="Appointment Details"
-        visible={modalVisible}
-        onCancel={() => setModalVisible(false)}
-        footer={null}
-      >
-        {appointmentDetails ? (
-          <div>
-            <p><strong>ID:</strong> {appointmentDetails.id}</p>
-            <p><strong>Date:</strong> {appointmentDetails.date}</p>
-            <p><strong>Status:</strong> {appointmentDetails.status}</p>
-            <p><strong>Patient Name:</strong> {appointmentDetails.patientName}</p>
-            <p><strong>Patient Phone Number:</strong> {appointmentDetails.patientPhoneNumber}</p>
-            <p><strong>Patient Address:</strong> {appointmentDetails.patientAddress}</p>
-            <p><strong>Slot Name:</strong> {appointmentDetails.slotName}</p>
-            <p><strong>Appointment Services:</strong></p>
-            <ul>
-      {appointmentDetails.appointmentServices.map(service => (
-        <li key={service.id} style={{ marginBottom: '10px' }}>
-          {service.serviceName} - {service.meetings.map(meeting => (
-            <span key={meeting.id} style={{ display: 'inline-block', marginRight: '10px' }}>
-              {meeting.id}
-              <Button
-                type="primary"
-                style={{ marginLeft: '10px', backgroundColor: doneMeetings.includes(meeting.id) ? '#00CC99' : '' }}
-                onClick={() => handleDoneClick(meeting.id)}
-                disabled={doneMeetings.includes(meeting.id)}
-              >
-                Done
-              </Button>
-            </span>
-          ))}
-        </li>
-      ))}
-    </ul>
-          </div>
-        ) : null}
-      </Modal>
+      {/* Appointment Details Modal */}
+<Modal
+  title="Appointment Details"
+  visible={modalVisible}
+  onCancel={() => setModalVisible(false)}
+  footer={null}
+>
+  {appointmentDetails ? (
+    <div>
+      <p><strong>ID:</strong> {appointmentDetails.id}</p>
+      <p><strong>Date:</strong> {appointmentDetails.date}</p>
+      <p><strong>Status:</strong> {appointmentDetails.status}</p>
+      <p><strong>Patient Name:</strong> {appointmentDetails.patientName}</p>
+      <p><strong>Patient Phone Number:</strong> {appointmentDetails.patientPhoneNumber}</p>
+      <p><strong>Patient Address:</strong> {appointmentDetails.patientAddress}</p>
+      <p><strong>Slot Name:</strong> {appointmentDetails.slotName}</p>
+      {appointmentDetails.result && (
+        <>
+          <p><strong>Note:</strong> {appointmentDetails.result.notes.map(note => note.content).join(', ')}</p>
+        </>
+      )}
+      <p><strong>Appointment Services:</strong></p>
+      <ul>
+        {appointmentDetails.appointmentServices.map(service => (
+          <li key={service.id} style={{ marginBottom: '10px' }}>
+            {service.serviceName} - {service.meetings.map(meeting => (
+              <span key={meeting.id} style={{ display: 'inline-block', marginRight: '10px' }}>
+                {meeting.id}
+                <Button
+                  type="primary"
+                  style={{ marginLeft: '10px', backgroundColor: doneMeetings.includes(meeting.id) ? '#00CC99' : '' }}
+                  onClick={() => handleDoneClick(meeting.id)}
+                  disabled={doneMeetings.includes(meeting.id)}
+                >
+                  Done
+                </Button>
+              </span>
+            ))}
+          </li>
+        ))}
+      </ul>
+    </div>
+  ) : null}
+</Modal>
+
 
       {/* Add Service Modal */}
       <Modal
