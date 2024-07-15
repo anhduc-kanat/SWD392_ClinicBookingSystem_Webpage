@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { Button, Table, Modal, Form, Input, Select, DatePicker } from "antd";
+import { Button, Table, Modal, Form, Input, Select, DatePicker, Row, Col } from "antd";
 import './DentistManagement.css';
 import moment from "moment/moment";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
@@ -232,130 +232,173 @@ const DentistManagement = () => {
                     layout="vertical"
                     name="form_in_modal"
                 >
-                    <Form.Item
-                        name="firstName"
-                        label="First Name"
-                        rules={[{ required: true, message: 'Please input the first name!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="lastName"
-                        label="Last Name"
-                        rules={[{ required: true, message: 'Please input the last name!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="email"
-                        label="Email"
-                        rules={[{ required: true, message: 'Please input the email!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="address"
-                        label="Address"
-                        rules={[{ required: true, message: 'Please input the address!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="phoneNumber"
-                        label="Phone Number"
-                        rules={[{ required: true, message: 'Please input the phone number!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="password"
-                        label="Password"
-                        rules={[{ required: true, message: 'Please input the password!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="dateOfBirth"
-                        label="Date of Birth"
-                        rules={[{ required: true, message: 'Please input the date of birth!' }]}
-                    >
-                        <DatePicker style={{ width: '100%' }} />
-                    </Form.Item>
-                    <Form.Item
-                        name="servicesId"
-                        label="Services"
-                        rules={[{ required: true, message: 'Please select services!' }]}
-                    >
-                        <Select
-                            mode="multiple"
-                            placeholder="Select services"
-                            onChange={handleServiceChange}
-                        >
-                            {services.map(service => (
-                                <Option key={service.id} value={service.id}>{service.name}</Option>
-                            ))}
-                        </Select>
-                    </Form.Item>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item
+                                name="firstName"
+                                label="First Name"
+                                rules={[{ required: true, message: 'Please input the first name!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="lastName"
+                                label="Last Name"
+                                rules={[{ required: true, message: 'Please input the last name!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item
+                                name="email"
+                                label="Email"
+                                rules={[{ required: true, message: 'Please input the email!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="address"
+                                label="Address"
+                                rules={[{ required: true, message: 'Please input the address!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item
+                                name="phoneNumber"
+                                label="Phone Number"
+                                rules={[{ required: true, message: 'Please input the phone number!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="password"
+                                label="Password"
+                                rules={[{ required: true, message: 'Please input the password!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item
+                                name="dateOfBirth"
+                                label="Date of Birth"
+                                rules={[{ required: true, message: 'Please input the date of birth!' }]}
+                            >
+                                <DatePicker style={{ width: '100%' }} />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="servicesId"
+                                label="Services"
+                                rules={[{ required: true, message: 'Please select services!' }]}
+                            >
+                                <Select
+                                    mode="multiple"
+                                    placeholder="Select services"
+                                    onChange={handleServiceChange}
+                                >
+                                    {services.map(service => (
+                                        <Option key={service.id} value={service.id}>{service.name}</Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                    </Row>
                 </Form>
             </Modal>
+
+
             <Modal
-                title="Edit Dentist"
-                visible={isEditModalVisible}
-                onOk={handleEditOk}
-                onCancel={handleEditCancel}
-                okText="Save"
-            >
-                <Form
-                    form={editForm}
-                    layout="vertical"
-                    name="edit_form_in_modal"
+    title="Edit Dentist"
+    visible={isEditModalVisible}
+    onOk={handleEditOk}
+    onCancel={handleEditCancel}
+    okText="Save"
+>
+    <Form
+        form={editForm}
+        layout="vertical"
+        name="edit_form_in_modal"
+    >
+        <Row gutter={16}>
+            <Col span={12}>
+                <Form.Item
+                    name="firstName"
+                    label="First Name"
+                    rules={[{ required: true, message: 'Please input the first name!' }]}
                 >
-                    <Form.Item
-                        name="firstName"
-                        label="First Name"
-                        rules={[{ required: true, message: 'Please input the first name!' }]}
+                    <Input />
+                </Form.Item>
+            </Col>
+            <Col span={12}>
+                <Form.Item
+                    name="lastName"
+                    label="Last Name"
+                    rules={[{ required: true, message: 'Please input the last name!' }]}
+                >
+                    <Input />
+                </Form.Item>
+            </Col>
+        </Row>
+        <Row gutter={16}>
+            <Col span={12}>
+                <Form.Item
+                    name="address"
+                    label="Address"
+                    rules={[{ required: true, message: 'Please input the address!' }]}
+                >
+                    <Input />
+                </Form.Item>
+            </Col>
+            <Col span={12}>
+                <Form.Item
+                    name="dateOfBirth"
+                    label="Date of Birth"
+                    rules={[{ required: true, message: 'Please input the date of birth!' }]}
+                >
+                    <DatePicker style={{ width: '100%' }} />
+                </Form.Item>
+            </Col>
+        </Row>
+        <Row gutter={16}>
+            <Col span={12}>
+                <Form.Item
+                    name="servicesId"
+                    label="Services"
+                    rules={[{ required: true, message: 'Please select services!' }]}
+                >
+                    <Select
+                        mode="multiple"
+                        placeholder="Select services"
+                        onChange={handleServiceChange}
+                        defaultValue={selectedServices}
                     >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="lastName"
-                        label="Last Name"
-                        rules={[{ required: true, message: 'Please input the last name!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="address"
-                        label="Address"
-                        rules={[{ required: true, message: 'Please input the address!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="dateOfBirth"
-                        label="Date of Birth"
-                        rules={[{ required: true, message: 'Please input the date of birth!' }]}
-                    >
-                        <DatePicker style={{ width: '100%' }} />
-                    </Form.Item>
-                    <Form.Item
-                        name="servicesId"
-                        label="Services"
-                        rules={[{ required: true, message: 'Please select services!' }]}
-                    >
-                        <Select
-                            mode="multiple"
-                            placeholder="Select services"
-                            onChange={handleServiceChange}
-                            defaultValue={selectedServices}
-                        >
-                            {services.map(service => (
-                                <Option key={service.id} value={service.id}>{service.name}</Option>
-                            ))}
-                        </Select>
-                    </Form.Item>
-                </Form>
-            </Modal>
+                        {services.map(service => (
+                            <Option key={service.id} value={service.id}>{service.name}</Option>
+                        ))}
+                    </Select>
+                </Form.Item>
+            </Col>
+        </Row>
+    </Form>
+</Modal>
+
             <Modal
                 title="Confirm Delete"
                 visible={isDeleteModalVisible}
