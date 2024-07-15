@@ -1,9 +1,10 @@
 /* Sidebar.css */
 .sidebar {
     height: 100%;
-    background-color: white;
+    background-color: #fff;
     padding-top: 20px;
     width: 250px;
+    border-right: 1px solid #ccc;
   }
   
   .sidebar .ant-collapse-borderless {
@@ -19,7 +20,7 @@
   }
   
   .sidebar .ant-collapse-header:hover {
-    background-color: #9b9c96;
+    background-color: #97d7e9;
     cursor: pointer;
   }
   
@@ -39,7 +40,7 @@
   }
   
   .sidebar ul li a:hover {
-    background-color: #9b9c96; /* Hover background color */
+    background-color: #97d7e9; /* Hover background color */
     border-radius: 10px;
     padding: 5px;
   }
@@ -47,7 +48,7 @@
   .sidebar ul li a.active-link {
     font-weight: bold;
     color: #000; /* Active link text color */
-    background-color: #9b9c96;
+    background-color: #8ce5fe;
     border-radius: 10px;
     padding: 5px; /* Active link background color */
   }

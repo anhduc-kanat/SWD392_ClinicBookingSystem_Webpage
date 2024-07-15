@@ -18,7 +18,6 @@ const UserPaymentHistory = () => {
         setPagination(pagination);
     };
 
-
     const getUserInfo = async () => {
         try {
             const userInfo = await fetchUserInfo(accessToken);
@@ -34,8 +33,11 @@ const UserPaymentHistory = () => {
         setLoading(true);
         try {
             const response = await axios.get(`${API_BASE_URL}/transaction/get-transaction-user/${userId}`);
-            console.log(response);
-            setPaymentHistory(response.data.data);
+            const paymentData = response.data.data.map(payment => ({
+                ...payment,
+                userAccountName: payment.appointment?.userAccountName || 'N/A', // Adjust according to the actual data structure
+            }));
+            setPaymentHistory(paymentData);
             setPagination((prev) => ({
                 ...prev,
                 total: response.data.data.length,
@@ -73,6 +75,11 @@ const UserPaymentHistory = () => {
             key: 'transactionNo',
         },
         {
+            title: 'User Account',
+            dataIndex: 'userAccountName',
+            key: 'userAccountName',
+        },
+        {
             title: 'Bank Code',
             dataIndex: 'bankCode',
             key: 'bankCode',
@@ -105,7 +112,7 @@ const UserPaymentHistory = () => {
                 }
             },
         },
-    ]
+    ];
 
     const paginatedData = paymentHistory.slice(
         (pagination.current - 1) * pagination.pageSize,
@@ -114,14 +121,14 @@ const UserPaymentHistory = () => {
 
     return (
         <>
-            <h1>User Payment History</h1>
-            <Table 
-            dataSource={paginatedData}
-            columns={columns}
-            rowKey="id"
-            pagination={pagination}
-            loading={loading}
-            onChange={handleTableChange}
+            <h1 style={{ fontWeight: "bold", fontSize: "2.5rem" }}>User Payment History</h1>
+            <Table
+                dataSource={paginatedData}
+                columns={columns}
+                rowKey="id"
+                pagination={pagination}
+                loading={loading}
+                onChange={handleTableChange}
             />
         </>
     );
