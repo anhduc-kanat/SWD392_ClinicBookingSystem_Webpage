@@ -78,7 +78,7 @@ const Appointment = () => {
     try {
       const accessToken = localStorage.getItem('accessToken');
       const response = await axios.get(
-        `${process.env.REACT_APP_API_BASE_URL}/service/get-all-services`,
+        `${process.env.REACT_APP_API_BASE_URL}/service/get-all-treatment-services`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,

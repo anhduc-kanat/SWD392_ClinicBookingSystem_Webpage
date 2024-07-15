@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form, Input, Select, DatePicker } from 'antd';
 import axios from 'axios';
 import Calendar from '../CustomerComponents/Calendar'; 
+import dayjs from 'dayjs';
+
 const Booking = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -18,7 +20,7 @@ const Booking = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/service/get-all-services`);
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/service/get-all-exam-services`);
         const services = response.data.data;
         const options = services.map(service => ({
           label: service.name,
@@ -85,7 +87,7 @@ const Booking = () => {
         });
         const patients = response.data.data;
         const options = patients.map(patient => ({
-          label: `${patient.firstName} ${patient.lastName} -Sinh ngày: ${patient.dateOfBirth}`,
+          label: `${patient.firstName} ${patient.lastName} - Sinh ngày: ${dayjs(patient.dateOfBirth).format('YYYY-MM-DD')}`,
           value: patient.id
         }));
         setPatientOptions(options);

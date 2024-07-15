@@ -23,18 +23,22 @@ const Booking = () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/service/get-all-services`);
         const services = response.data.data;
-        const options = services.map(service => ({
-          label: service.name,
-          value: service.id
-        }));
+        const options = services.map(service => {
+          const serviceTypeLabel = service.serviceType === 1 ? 'Khám bệnh' : service.serviceType === 2 ? 'điều trị' : 'unknown';
+          return {
+            label: `${service.name} (${serviceTypeLabel})`,
+            value: service.id
+          };
+        });
         setServiceOptions(options);
       } catch (error) {
         console.error('Failed to fetch services:', error);
       }
     };
-
+  
     fetchServices();
   }, []);
+  
 
   useEffect(() => {
     if (selectedService) {
