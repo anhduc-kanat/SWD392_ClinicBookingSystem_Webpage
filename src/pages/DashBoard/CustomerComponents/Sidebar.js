@@ -59,7 +59,7 @@ const Sidebar = () => {
               </NavLink>
             </li>
             <li>
-              <NavLink to="/customer/user-payment-history" className={selectedKey === '/customer/results' ? 'active-link' : ''}>
+              <NavLink to="/customer/user-payment-history" className={selectedKey === '/customer/user-payment-history' ? 'active-link' : ''}>
                 Lịch sử giao dịch
               </NavLink>
             </li>

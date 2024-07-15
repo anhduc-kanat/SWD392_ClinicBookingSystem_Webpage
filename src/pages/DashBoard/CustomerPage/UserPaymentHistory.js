@@ -121,7 +121,7 @@ const UserPaymentHistory = () => {
 
     return (
         <>
-            <h1>User Payment History</h1>
+            <h1 style={{ fontWeight: "bold", fontSize: "2.5rem" }}>User Payment History</h1>
             <Table
                 dataSource={paginatedData}
                 columns={columns}
