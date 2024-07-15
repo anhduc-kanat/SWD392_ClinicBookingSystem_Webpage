@@ -1,4 +1,4 @@
-import { Button, DatePicker, Form, Input, Modal, Table } from "antd";
+import { Button, Col, DatePicker, Form, Input, Modal, Row, Table } from "antd";
 import "./StaffManagement.css"
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -208,48 +208,66 @@ const StaffManagement = () => {
                     layout="vertical"
                     name="form_in_modal"
                 >
-                    <Form.Item
-                        name="firstName"
-                        label="First Name"
-                        rules={[{ required: true, message: 'Please input the first name!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="lastName"
-                        label="Last Name"
-                        rules={[{ required: true, message: 'Please input the last name!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="email"
-                        label="Email"
-                        rules={[{ required: true, message: 'Please input the email!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="address"
-                        label="Address"
-                        rules={[{ required: true, message: 'Please input the address!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="phoneNumber"
-                        label="Phone Number"
-                        rules={[{ required: true, message: 'Please input the phone number!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="password"
-                        label="Password"
-                        rules={[{ required: true, message: 'Please input the password!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item
+                                name="firstName"
+                                label="First Name"
+                                rules={[{ required: true, message: 'Please input the first name!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="lastName"
+                                label="Last Name"
+                                rules={[{ required: true, message: 'Please input the last name!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item
+                                name="email"
+                                label="Email"
+                                rules={[{ required: true, message: 'Please input the email!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="address"
+                                label="Address"
+                                rules={[{ required: true, message: 'Please input the address!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item
+                                name="phoneNumber"
+                                label="Phone Number"
+                                rules={[{ required: true, message: 'Please input the phone number!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="password"
+                                label="Password"
+                                rules={[{ required: true, message: 'Please input the password!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                    </Row>
                     <Form.Item
                         name="dateOfBirth"
                         label="Date of Birth"
