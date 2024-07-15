@@ -25,6 +25,7 @@ const ReCheck = () => {
     5: 'InQueue'
   };
   const statusText = {
+    1: 'Done',
     2: 'OnGoing',
     3: 'Scheduled',
     4: 'Rejected',

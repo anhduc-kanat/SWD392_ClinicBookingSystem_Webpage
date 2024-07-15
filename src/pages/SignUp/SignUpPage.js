@@ -52,7 +52,7 @@ const SignUpPage = () => {
                 name="phoneNumber"
                 rules={[{ required: true, message: 'Please input your phone number!' }]}
               >
-                <Input prefix={<UserOutlined />} placeholder="Phone Number" />
+                <Input type='number' prefix={<UserOutlined />} placeholder="Phone Number" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>

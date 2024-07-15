@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, message, Form, Input, Select, DatePicker } from 'antd';
+import { Table, Button, Modal, message, Form, Input, Select, DatePicker, } from 'antd';
 import axios from 'axios';
 const { Option } = Select;
 
@@ -14,6 +14,7 @@ const Appointment = () => {
   const [currentRecord, setCurrentRecord] = useState(null);
   const [serviceModalVisible, setServiceModalVisible] = useState(false);
   const [noteModalVisible, setNoteModalVisible] = useState(false);
+  const [doneMeetings, setDoneMeetings] = useState([]);
   const [serviceInfo, setServiceInfo] = useState({
     appointmentId: null,
     businessServiceId: null,
@@ -126,9 +127,9 @@ const Appointment = () => {
   const handleAddNote = (record) => {
     const appointmentBusinessServiceId = record.appointmentServices.length > 0 ? record.appointmentServices[0].id : null;
     setCurrentRecord(record);
-    setNoteInfo({ 
-      ...noteInfo, 
-      appointmentId: record.id, 
+    setNoteInfo({
+      ...noteInfo,
+      appointmentId: record.id,
       resultId: record.result.id,
       appointmentBusinessServiceId: appointmentBusinessServiceId
     });
@@ -179,6 +180,34 @@ const Appointment = () => {
       content: e.target.value,
     }));
   };
+  const handleDoneClick = async (meetingId) => {
+    const accessToken = localStorage.getItem('accessToken');
+
+    if (!accessToken) {
+      message.error('Access token is missing');
+      return;
+    }
+
+    try {
+      const response = await axios.put(
+        `https://api-swd.zouzoumanagement.xyz/api/meeting/update-meeting-into-done/${meetingId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        message.success('Meeting marked as done successfully');
+        setDoneMeetings((prevDoneMeetings) => [...prevDoneMeetings, meetingId]);
+      }
+    } catch (error) {
+      message.error('Failed to mark the meeting as done');
+      console.error(error);
+    }
+  };
 
   const handleSaveService = async () => {
     try {
@@ -204,8 +233,8 @@ const Appointment = () => {
       message.error('Failed to add service');
     }
   };
-  
-  
+
+
 
   // Save note function
   const handleSaveNote = async () => {
@@ -308,12 +337,24 @@ const Appointment = () => {
             <p><strong>Slot Name:</strong> {appointmentDetails.slotName}</p>
             <p><strong>Appointment Services:</strong></p>
             <ul>
-              {appointmentDetails.appointmentServices.map(service => (
-                <li key={service.id}>
-                  {service.serviceName} - {service.meetings.join(', ')} {/* Display arraystringdate format */}
-                </li>
-              ))}
-            </ul>
+      {appointmentDetails.appointmentServices.map(service => (
+        <li key={service.id} style={{ marginBottom: '10px' }}>
+          {service.serviceName} - {service.meetings.map(meeting => (
+            <span key={meeting.id} style={{ display: 'inline-block', marginRight: '10px' }}>
+              {meeting.id}
+              <Button
+                type="primary"
+                style={{ marginLeft: '10px', backgroundColor: doneMeetings.includes(meeting.id) ? '#00CC99' : '' }}
+                onClick={() => handleDoneClick(meeting.id)}
+                disabled={doneMeetings.includes(meeting.id)}
+              >
+                Done
+              </Button>
+            </span>
+          ))}
+        </li>
+      ))}
+    </ul>
           </div>
         ) : null}
       </Modal>
