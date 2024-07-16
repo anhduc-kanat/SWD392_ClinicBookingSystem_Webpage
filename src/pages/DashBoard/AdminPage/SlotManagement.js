@@ -92,9 +92,13 @@ const SlotManagement = () => {
                 ...selectedSlot,
                 name: values.name,
                 description: values.description,
-                startAt: `${values.startAtHour}:${values.startAtMinute}:00`,
-                endAt: `${values.endAtHour}:${values.endAtMinute}:00`,
+                startAtHour: values.startAtHour,
+                startAtMinute: values.startAtMinute,
+                endAtHour: values.endAtHour,
+                endAtMinute: values.endAtMinute,
             };
+            console.log(updatedSlot)
+            
             await axios.put(`${process.env.REACT_APP_API_BASE_URL}/slot/update-slot/${selectedSlot.id}`, updatedSlot);
             fetchSlots();
             setIsEditModalVisible(false);
