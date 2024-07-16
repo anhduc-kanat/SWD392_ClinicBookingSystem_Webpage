@@ -2,10 +2,11 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { Button, Table, Modal, Form, Input, Select, DatePicker, Row, Col } from "antd";
 import './DentistManagement.css';
-import moment from "moment/moment";
+// import moment from "moment/moment";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
-
+import dayjs from "dayjs";
 const { Option } = Select;
+
 
 const DentistManagement = () => {
     const [dentists, setDentists] = useState([]);
@@ -63,9 +64,12 @@ const DentistManagement = () => {
     const handleOk = async () => {
         try {
             const values = await form.validateFields();
+            const updatedDateOfBirth = dayjs(values.dateOfBirth).format('YYYY-MM-DD');
             const dentistData = {
                 ...values,
                 servicesId: selectedServices,
+                dateOfBirth: updatedDateOfBirth
+
             };
             await axios.post(`${process.env.REACT_APP_API_BASE_URL}/dentist/create-dentist`, dentistData);
             fetchDentists(); // Refresh the list after creating a new dentist
@@ -91,7 +95,7 @@ const DentistManagement = () => {
             firstName: dentist.firstName,
             lastName: dentist.lastName,
             address: dentist.address,
-            dateOfBirth: dentist.dateOfBirth ? moment(dentist.dateOfBirth) : null,
+            dateOfBirth: dentist.dateOfBirth ? dayjs(dentist.dateOfBirth): null,
             servicesId: serviceIds,
         });
         setIsEditModalVisible(true);
@@ -130,9 +134,12 @@ const DentistManagement = () => {
     const handleEditOk = async () => {
         try {
             const values = await editForm.validateFields();
+            const updatedDateOfBirth = dayjs(values.dateOfBirth).format('YYYY-MM-DD');
+            console.log(values);
             const updatedDentist = {
                 ...selectedDentist,
                 ...values,
+                dateOfBirth: updatedDateOfBirth,
                 servicesId: selectedServices, // Include servicesId in the update
             };
             await axios.put(`${process.env.REACT_APP_API_BASE_URL}/dentist/update-dentist/${selectedDentist.id}`, updatedDentist);
@@ -192,7 +199,7 @@ const DentistManagement = () => {
             key: 'dateOfBirth',
             render: (dateOfBirth) => {
                 const date = new Date(dateOfBirth);
-                const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+                const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0') }`;
                 return formattedDate;
             },
         },
@@ -279,7 +286,7 @@ const DentistManagement = () => {
                                 label="Phone Number"
                                 rules={[{ required: true, message: 'Please input the phone number!' }]}
                             >
-                                <Input />
+                                <Input type="number"/>
                             </Form.Item>
                         </Col>
                         <Col span={12}>

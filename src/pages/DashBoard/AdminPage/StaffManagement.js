@@ -2,8 +2,9 @@ import { Button, Col, DatePicker, Form, Input, Modal, Row, Table } from "antd";
 import "./StaffManagement.css"
 import { useEffect, useState } from "react";
 import axios from "axios";
-import moment from "moment";
+// import moment from "moment";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
+import dayjs from "dayjs";
 
 const StaffManagement = () => {
     const [loading, setLoading] = useState(false);
@@ -45,9 +46,12 @@ const StaffManagement = () => {
     const handleOk = async () => {
         try {
             const values = await form.validateFields();
+            const updatedDateOfBirth = dayjs(values.dateOfBirth).format('YYYY-MM-DD');
             const staffData = {
-                ...values
+                ...values,
+                dateOfBirth: updatedDateOfBirth
             };
+            console.log(updatedDateOfBirth, values)
             await axios.post(`${process.env.REACT_APP_API_BASE_URL}/staff/create-staff`, staffData);
             fetchStaffs(); // Refresh the list after creating a new staff
             setIsModalVisible(false);
@@ -73,7 +77,7 @@ const StaffManagement = () => {
             firstName: staff.firstName,
             lastName: staff.lastName,
             address: staff.address,
-            dateOfBirth: staff.dateOfBirth ? moment(staff.dateOfBirth) : null,
+            dateOfBirth: staff.dateOfBirth ? dayjs(staff.dateOfBirth) : null,
         });
         setIsEditModalVisible(true);
     };
@@ -81,10 +85,12 @@ const StaffManagement = () => {
     const handleEditOk = async () => {
         try {
             const values = await editForm.validateFields();
+            const updatedDateOfBirth = dayjs(values.dateOfBirth).format('YYYY-MM-DD');
             const updatedStaff = {
                 ...selectedStaff,
                 ...values,
-            };
+                dateOfBirth : updatedDateOfBirth
+                };
             await axios.put(`${process.env.REACT_APP_API_BASE_URL}/staff/update-staff/${selectedStaff.id}`, updatedStaff);
             fetchStaffs(); // Refresh the list after updating the staff
             setIsEditModalVisible(false);
@@ -255,7 +261,7 @@ const StaffManagement = () => {
                                 label="Phone Number"
                                 rules={[{ required: true, message: 'Please input the phone number!' }]}
                             >
-                                <Input />
+                                <Input type="number"/>
                             </Form.Item>
                         </Col>
                         <Col span={12}>
