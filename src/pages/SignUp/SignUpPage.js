@@ -17,8 +17,12 @@ const SignUpPage = () => {
     try {
       const response = await axios.post(`${apiBaseUrl}/authentication/register`, values);
       console.log('Success:', response.data);
-      message.success('Sign-up successful! Please log in.');
-      navigate('/login');
+      if (response.data.statusCode === 400) {
+        message.error(response.data.message)
+      } else {
+        message.success('Sign-up successful! Please log in.');
+        navigate('/login');
+      }
     } catch (error) {
       console.error('Failed:', error);
       message.error('Sign-up failed. Please try again.');
