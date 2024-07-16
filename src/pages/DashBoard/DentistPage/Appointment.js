@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, message, Form, Input, Select, DatePicker, Descriptions, Tag } from 'antd';
+import { Table, Button, Modal, message, Form, Input, Select, DatePicker, Descriptions } from 'antd';
 import axios from 'axios';
-
 
 const { Option } = Select;
 
@@ -20,7 +19,7 @@ const Appointment = () => {
   const [serviceInfo, setServiceInfo] = useState({
     appointmentId: null,
     businessServiceId: null,
-    serviceDate: null,
+    serviceDates: [{ id: Date.now(), date: null }],
   });
   const [noteInfo, setNoteInfo] = useState({
     appointmentId: null,
@@ -133,16 +132,16 @@ const Appointment = () => {
   const handleServiceModalCancel = () => {
     setServiceModalVisible(false);
     setServiceInfo({
-      ...serviceInfo,
+      appointmentId: null,
       businessServiceId: null,
-      serviceDate: null,
+      serviceDates: [{ id: Date.now(), date: null }],
     });
   };
 
   const handleNoteModalCancel = () => {
     setNoteModalVisible(false);
     setNoteInfo({
-      ...noteInfo,
+      appointmentId: null,
       content: '',
       resultId: null,
       appointmentBusinessServiceId: null,
@@ -156,10 +155,27 @@ const Appointment = () => {
     }));
   };
 
-  const handleServiceDateChange = (date, dateString) => {
+  const handleServiceDateChange = (date, dateString, id) => {
     setServiceInfo(prevState => ({
       ...prevState,
-      serviceDate: dateString,
+      serviceDates: prevState.serviceDates.map(sd =>
+        sd.id === id ? { ...sd, date: dateString } : sd
+      ),
+    }));
+    console.log(serviceInfo);
+  };
+
+  const addDateField = () => {
+    setServiceInfo(prevState => ({
+      ...prevState,
+      serviceDates: [...prevState.serviceDates, { id: Date.now(), date: null }],
+    }));
+  };
+
+  const removeDateField = (id) => {
+    setServiceInfo(prevState => ({
+      ...prevState,
+      serviceDates: prevState.serviceDates.filter(sd => sd.id !== id),
     }));
   };
 
@@ -201,13 +217,18 @@ const Appointment = () => {
 
   const handleSaveService = async () => {
     try {
+      const hasInvalidDate = serviceInfo.serviceDates.some(sd => !sd.date);
+      if (!serviceInfo.businessServiceId || hasInvalidDate) {
+        message.error('Please select a service and ensure all dates are chosen');
+        return;
+      }
       const accessToken = localStorage.getItem('accessToken');
       const response = await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}/appointment/dentist-add-service-into-appointment/${currentRecord.id}`,
         [
           {
             businessServiceId: serviceInfo.businessServiceId,
-            meetings: [{ date: serviceInfo.serviceDate }],
+            meetings: serviceInfo.serviceDates.map(sd => ({ date: sd.date })),
           }
         ],
         {
@@ -216,10 +237,14 @@ const Appointment = () => {
           },
         }
       );
+
       message.success('Service added successfully');
       setServiceModalVisible(false);
       window.location.reload(); // Reload the page after successful addition
     } catch (error) {
+      if (error.response.data.statusCode == 409) {
+        message.error(error.response.data.error);
+      }
       message.error('Failed to add service');
     }
   };
@@ -291,56 +316,56 @@ const Appointment = () => {
 
   return (
     <div>
-    <Table
-      dataSource={data}
-      columns={columns}
-      loading={loading}
-      rowKey="id"
-      pagination={{
-        current: pageNumber,
-        pageSize: pageSize,
-        total: totalRecords,
-      }}
-      onChange={handleTableChange}
-    />
+      <Table
+        dataSource={data}
+        columns={columns}
+        loading={loading}
+        rowKey="id"
+        pagination={{
+          current: pageNumber,
+          pageSize: pageSize,
+          total: totalRecords,
+        }}
+        onChange={handleTableChange}
+      />
 
-    <Modal
-      title="Appointment Details"
-      visible={modalVisible}
-      onCancel={() => setModalVisible(false)}
-      footer={[
-        <Button key="close" onClick={() => setModalVisible(false)}>
-          Close
-        </Button>,
-      ]}
-    >
-      {appointmentDetails && (
-        <Descriptions bordered column={1}>
-          <Descriptions.Item label="Appointment ID">{appointmentDetails.id}</Descriptions.Item>
-          <Descriptions.Item label="Patient Name">{appointmentDetails.patientName}</Descriptions.Item>
-          <Descriptions.Item label="Result ID">{appointmentDetails.result && appointmentDetails.result.id}</Descriptions.Item>
-          <Descriptions.Item label="Slot Name">{appointmentDetails.slotName}</Descriptions.Item>
-          {appointmentDetails.appointmentServices.map(service => (
-            <Descriptions.Item key={service.id} label={`Service: ${service.serviceName}`}>
-              {service.meetings.map((meeting, index) => (
-                <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span>{meeting.date}</span>
-                  <Button
-                    type="primary"
-                    onClick={() => handleDoneClick(meeting.id)}
-                    disabled={doneMeetings.includes(meeting.id)}
-                  >
-                    {doneMeetings.includes(meeting.id) ? 'Completed' : 'Done'}
-                  </Button>
-                </div>
-              ))}
-            </Descriptions.Item>
-          ))}
-        </Descriptions>
-      )}
-    </Modal>
+      <Modal
+        title="Appointment Details"
+        visible={modalVisible}
+        onCancel={() => setModalVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setModalVisible(false)}>
+            Close
+          </Button>,
+        ]}
+      >
+        {appointmentDetails && (
+          <Descriptions bordered column={1}>
+            <Descriptions.Item label="Appointment ID">{appointmentDetails.id}</Descriptions.Item>
+            <Descriptions.Item label="Patient Name">{appointmentDetails.patientName}</Descriptions.Item>
+            <Descriptions.Item label="Result ID">{appointmentDetails.result && appointmentDetails.result.id}</Descriptions.Item>
+            <Descriptions.Item label="Slot Name">{appointmentDetails.slotName}</Descriptions.Item>
+            {appointmentDetails.appointmentServices.map(service => (
+              <Descriptions.Item key={service.id} label={`Service: ${service.serviceName}`}>
+                {service.meetings.map((meeting, index) => (
+                  <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span>{meeting.date}</span>
+                    <Button
+                      type="primary"
+                      onClick={() => handleDoneClick(meeting.id)}
+                      disabled={doneMeetings.includes(meeting.id)}
+                    >
+                      {doneMeetings.includes(meeting.id) ? 'Completed' : 'Done'}
+                    </Button>
+                  </div>
+                ))}
+              </Descriptions.Item>
+            ))}
+          </Descriptions>
+        )}
+      </Modal>
 
-    <Modal
+      <Modal
         title="Add Service"
         visible={serviceModalVisible}
         onCancel={handleServiceModalCancel}
@@ -356,6 +381,7 @@ const Appointment = () => {
         <Form layout="vertical">
           <Form.Item label="Select Service">
             <Select
+              value={serviceInfo.businessServiceId}
               placeholder="Select a service"
               onChange={handleServiceInfoChange}
               style={{ width: '100%' }}
@@ -365,34 +391,44 @@ const Appointment = () => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item label="Select Date">
-            <DatePicker
-              onChange={handleServiceDateChange}
-              style={{ width: '100%' }}
+          {serviceInfo.serviceDates.map(sd => (
+            <Form.Item key={sd.id} label="Select Date"
+            >
+              <DatePicker
+                onChange={(date, dateString) => handleServiceDateChange(date, dateString, sd.id)}
+                style={{ width: '100%' }}
+              />
+              {serviceInfo.serviceDates.length > 1 && (
+                <Button onClick={() => removeDateField(sd.id)} style={{ marginTop: '10px' }}>
+                  Remove
+                </Button>
+              )}
+            </Form.Item>
+          ))}
+          <Button onClick={addDateField} style={{ width: '100%' }}>
+            Add Another Date
+          </Button>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="Add Note"
+        visible={noteModalVisible}
+        onCancel={handleNoteModalCancel}
+        onOk={handleSaveNote}
+      >
+        <Form layout="vertical">
+          <Form.Item label="Note">
+            <Input.TextArea
+              value={noteInfo.content}
+              onChange={handleNoteContentChange}
+              rows={4}
             />
           </Form.Item>
         </Form>
       </Modal>
-
-    <Modal
-      title="Add Note"
-      visible={noteModalVisible}
-      onCancel={handleNoteModalCancel}
-      onOk={handleSaveNote}
-    >
-      <Form layout="vertical">
-        <Form.Item label="Note">
-          <Input.TextArea
-            value={noteInfo.content}
-            onChange={handleNoteContentChange}
-            rows={4}
-          />
-        </Form.Item>
-      </Form>
-    </Modal>
-  </div>
-);
+    </div>
+  );
 };
 
 export default Appointment;
-
