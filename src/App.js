@@ -9,6 +9,7 @@ import CustomerDashboard from './pages/DashBoard/CustomerDashboard';
 import DentistDashboard from './pages/DashBoard/DentistDashboard';
 import ProtectedRoute from './ProtectedRoute';
 import AdminDashboard from './pages/DashBoard/AdminDashboard';
+import Success from './pages/DashBoard/CustomerPage/Success';
 
 
 const App = () => {
@@ -33,6 +34,10 @@ const App = () => {
         <Route
           path="/clinicowner/*"
           element={<ProtectedRoute element={<AdminDashboard />} allowedRoles={['ADMIN']} />}
+        />
+        <Route 
+        path='/customer/success'
+        element={<Success />}
         />
       </Routes>
     </Router>

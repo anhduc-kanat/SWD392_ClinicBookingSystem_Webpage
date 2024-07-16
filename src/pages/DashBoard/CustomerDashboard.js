@@ -24,7 +24,7 @@ const CustomerDashboard = () => {
             <Route path="user-info" element={<UserInfo />} />
             <Route path="user-profile" element={<UserProfile />} />
             <Route path="results" element={<Results />} />
-            <Route path="success" element={<Success />} /> 
+            {/* <Route path="success" element={<Success />} /> */}
             <Route path="fail" element={<Fail />} /> 
             <Route path="user-payment-history" element={<UserPaymentHistory />} />
           </Routes>
